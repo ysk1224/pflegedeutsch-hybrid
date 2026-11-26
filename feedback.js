@@ -1,3 +1,5 @@
+import { InferenceSource } from 'firebase/ai';
+
 export const feedbackSchema = {
   type: 'object',
   properties: {
@@ -24,8 +26,8 @@ export function readFeedback(text) {
 }
 
 export function sourceKind(source) {
-  if (source === 'ON_DEVICE') return 'device';
-  if (source === 'IN_CLOUD') return 'cloud';
+  if (source === InferenceSource.ON_DEVICE) return 'device';
+  if (source === InferenceSource.IN_CLOUD) return 'cloud';
   return 'unknown';
 }
 

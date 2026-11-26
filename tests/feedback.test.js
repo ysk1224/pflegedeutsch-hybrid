@@ -13,13 +13,13 @@ test('structured feedback is only accepted with both bounded, nonempty strings',
 });
 
 test('SDK response is the source of labels, independent of requested mode', () => {
-  assert.equal(sourceKind('ON_DEVICE'), 'device');
-  assert.equal(sourceKind('IN_CLOUD'), 'cloud');
+  assert.equal(sourceKind('on_device'), 'device');
+  assert.equal(sourceKind('in_cloud'), 'cloud');
   assert.equal(sourceKind(undefined), 'unknown');
-  assert.equal(verifiedSource('ON_DEVICE', true), 'device');
-  assert.equal(verifiedSource('IN_CLOUD', true), 'cloud');
+  assert.equal(verifiedSource('on_device', true), 'device');
+  assert.equal(verifiedSource('in_cloud', true), 'cloud');
   assert.equal(verifiedSource(undefined, false), 'unknown');
-  assert.throws(() => verifiedSource('IN_CLOUD', false), /unexpected-source/);
+  assert.throws(() => verifiedSource('in_cloud', false), /unexpected-source/);
 });
 
 test('deadline resolves promptly, preserves failures and calls cancellation on timeout', async () => {

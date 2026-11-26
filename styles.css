@@ -43,6 +43,7 @@ button:hover:not(:disabled) { box-shadow: inset 0 0 0 2px currentColor; }
 .skip { position: absolute; left: .8rem; top: .8rem; transform: translateY(-180%); background: white; color: var(--brand); padding: .5rem; }
 .skip:focus { transform: none; }
 .notice, .example { padding: .75rem; background: var(--wash); border-radius: .5rem; }
+[lang="ko"] { word-break: keep-all; overflow-wrap: anywhere; }
 .muted { color: var(--muted); font-size: .9rem; }
 fieldset { margin: 1rem 0; min-width: 0; border: 1px solid var(--border); border-radius: .55rem; padding: .4rem .75rem .6rem; }
 legend { padding-inline: .25rem; }
