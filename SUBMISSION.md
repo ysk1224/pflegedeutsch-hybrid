@@ -28,10 +28,11 @@ The public repository history begins on November 26, 2026. During the contest wi
 
 ## Links
 
+- [Public demo video](https://youtu.be/ZCv-XcwUeQs)
 - [Web app](https://pflegedeutsch-hybrid.web.app)
 - [Public source code](https://github.com/ysk1224/pflegedeutsch-hybrid)
 - [Judge testing instructions](docs/ARCHITECTURE.md#judge-test-steps)
 
-## Submission handoff
+## Live demo verification
 
-Confirm the hosted page serves the release candidate, verify both inference sources on the hosted build, and insert the public YouTube video URL in Devpost before submission. Confirm that the default-branch source and judging link match the hosted build.
+The hosted v0.7 release candidate was tested with the same fictional ICU handover in two environments. With cloud fallback off on supported desktop Chrome, the app reported `On-device`. In a browser without the local model, the app displayed the device-only availability message and then reported `Cloud` after fallback was enabled for the fictional case. The public demo shows both workflows.
