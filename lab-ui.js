@@ -107,14 +107,14 @@ function loadMistake() {
   checkDraft();
 }
 
-function showSuggestion(output, feedback) {
-  output.replaceChildren(textNode('p', feedback.german, 'de'), textNode('p', feedback.english, 'en'));
+function showSuggestion(output, german, guidance) {
+  output.replaceChildren(textNode('p', german, 'de'), ...guidance.map(tip => textNode('p', tip, 'en')));
   output.hidden = false;
 }
 
 function acceptPublicExample(german, stageId) {
-  // A known factual match limits the displayed AI example to the case rubric.
-  return assessIntegrity(german, stageId).factual.state === 'verified';
+  const check = assessIntegrity(german, stageId);
+  return check.factual.state === 'verified' && check.grammar.state === 'verified';
 }
 
 $('patientQuote').textContent = patientQuote;
@@ -136,6 +136,7 @@ $('labDevice').addEventListener('click', async () => {
   if (!validDraft()) return;
   const request = ++deviceRequest;
   const requestStage = stage;
+  const answer = draft.value;
   const status = $('labDeviceStatus');
   const output = $('labDeviceOutput');
   const statusForRequest = { set textContent(value) { if (request === deviceRequest) status.textContent = value; } };
@@ -143,10 +144,11 @@ $('labDevice').addEventListener('click', async () => {
   output.hidden = true;
   status.textContent = 'Opening the on-device model…';
   try {
-    const result = await requestDeviceFeedback(buildIntegrityLanguagePrompt(requestStage, draft.value), statusForRequest);
+    const result = await requestDeviceFeedback(buildIntegrityLanguagePrompt(requestStage, answer), statusForRequest);
     if (request !== deviceRequest) return;
     if (!acceptPublicExample(result.feedback.german, requestStage.id)) throw new Error('unverified-example');
-    showSuggestion(output, result.feedback);
+    const tips = assessIntegrity(answer, requestStage.id).grammar.issues.map(issue => issue.text);
+    showSuggestion(output, result.feedback.german, tips.length ? tips : [requestStage.success]);
     status.textContent = `On-device AI · ${result.total.toFixed(1)} s total · Grammar suggestion`;
   } catch (error) {
     if (request === deviceRequest) status.textContent = feedbackError(error);
@@ -181,10 +183,9 @@ $('coachForm').addEventListener('submit', async event => {
   status.textContent = 'Requesting cloud coaching…';
   try {
     const result = await request;
-    if (!integrityStages.some(item => acceptPublicExample(result.feedback.german, item.id))) {
-      throw new Error('unverified-example');
-    }
-    showSuggestion(output, result.feedback);
+    const match = integrityStages.find(item => acceptPublicExample(result.feedback.german, item.id));
+    if (!match) throw new Error('unverified-example');
+    showSuggestion(output, result.feedback.german, [match.success]);
     status.textContent = 'Cloud AI · Public-case coaching';
   } catch (error) {
     status.textContent = feedbackError(error, true);

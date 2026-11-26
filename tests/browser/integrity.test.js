@@ -10,7 +10,7 @@ import { build, preview } from 'vite';
 const sentinel = 'LEARNER_DRAFT_MUST_STAY_LOCAL';
 const validResponse = {
   german: 'Patientin berichtet über Atemnot beim Gehen.',
-  english: 'Attribute the symptom to the patient.'
+  english: 'The main verb should be in the nominative case.'
 };
 let dist;
 let server;
@@ -165,6 +165,8 @@ test('Chromium request capture: no external traffic before consent; cloud sends 
   await page.locator('#coachConsent').check();
   await page.locator('#coachRun').click();
   await waitForText(page, '#coachStatus', /Cloud AI/);
+  assert.match(await page.locator('#coachOutput').innerText(), /Document the source/);
+  assert.doesNotMatch(await page.locator('#coachOutput').innerText(), /nominative case/);
   assert.equal(await page.locator('#coachConsent').isChecked(), false);
   assert.equal(cloud.length, 1);
   assert.match(cloud[0].body, /breathlessness while walking/);
@@ -228,6 +230,8 @@ test('Chromium on-device path: Firebase adapter, unavailable change and CSP netw
   await page.locator('#labDraft').fill(sentinel);
   await page.locator('#labDevice').click();
   await waitForText(page, '#labDeviceStatus', /On-device AI/);
+  assert.match(await page.locator('#labDeviceOutput').innerText(), /Document the source/);
+  assert.doesNotMatch(await page.locator('#labDeviceOutput').innerText(), /nominative case/);
   assert.match(await frame.evaluate(() => window.modelInput), new RegExp(sentinel));
   assert.deepEqual(external, []);
 

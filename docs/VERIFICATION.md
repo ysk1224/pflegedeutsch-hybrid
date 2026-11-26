@@ -34,3 +34,7 @@ Reproduce with `npm ci`, `npm test`, `npm run build`, `npx playwright install ch
 - No learner study, expert rubric validation, clinical outcome evaluation or model latency benchmark was performed. Known unsupported phrases are covered in tests. Free-form language and factual inference remain limited.
 
 The deployed v0.7 release predates the fix to prevent draft transmission when the local model is unavailable. It is excluded from the safe rollback plan. Retain the previous hosting version for history and prepare an independently verified safe build before changing production.
+
+## Hosted preview and on-device feedback correction
+
+On 26 November 2026, the Firebase preview matched the six files in the configured bundle byte for byte and served the device frame with the restrictive CSP header. On the project owner's desktop Chrome, the Lab showed an actual on-device response in 38.4 seconds for the demo. The German example matched the case. Its generated grammar explanation incorrectly assigned nominative case to the verb. The follow-up patch pairs accepted examples with built-in guidance and regression tests inject that exact model error on both Lab paths. The patched build still needs a real-device repeat. Cloud coaching on the hosted preview reached the authorization error before any inference in the automated check; no successful live cloud result was observed.
