@@ -17,7 +17,7 @@ const statusLabels = {
 
 export async function showDeviceAvailability(status, buttons) {
   if (!configured) {
-    status.textContent = 'On-device AI is unconfigured in this build. The local checks are available.';
+    status.textContent = 'On-device AI is unconfigured in this build.';
     return;
   }
   status.textContent = 'Checking on-device support…';

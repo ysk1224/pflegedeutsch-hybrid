@@ -7,6 +7,7 @@
 | Node regression suite | 20 passed | Includes both Lab assessment tracks, curated references, abstention on unfamiliar text, cloud allowlist and legacy exercise and storage logic. |
 | Vite production build | Passed | Emits separate app and device-frame HTML entry points. |
 | Browser automation | Five scenarios passed in headless Chromium 158.0.8127.0 | Desktop exercise and legacy regressions, request capture and cloud errors, denied attestation, device adapter/CSP, responsive accessibility. Firebase and the Prompt API were simulated where used. |
+| Unconfigured production bundle | Handover demo works at 1440 and 390 CSS pixels | An additional browser smoke check confirmed zero external requests and no horizontal overflow. |
 | Responsive and automated accessibility | 320, 390 and 1440 CSS pixels | No horizontal overflow. Skip-link keyboard focus and judge-demo result focus were checked. Axe reported zero violations against the selected WCAG 2/2.1 A and AA rule tags in the tested state. |
 
 ## Network evidence
