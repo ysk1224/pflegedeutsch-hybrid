@@ -1,3 +1,4 @@
+import {referenceFor} from './grammar.js';
 import { exercises, buildPrompt, validateAnswer } from './exercises.js';
 const $=id=>document.getElementById(id);
 const env=import.meta.env;
@@ -15,7 +16,7 @@ function persistReview(){try{localStorage.setItem('pflege-review',JSON.stringify
 $('saveReview').onclick=()=>{const id=current().id;if(review.has(id))review.delete(id);else review.add(id);persistReview();};
 $('nextReview').onclick=()=>{if(busy||!review.size)return;const ids=[...review],i=ids.indexOf(current().id);$('case').value=ids[(i+1)%ids.length];refresh();};
 function progress(){ $('meter').max=exercises.length; $('progress').textContent=completed.size+' / '+exercises.length+' exercises reviewed'; $('meter').value=completed.size; }
-function refresh(){const ex=current();$('scenario').textContent=ex.task;$('answer').value='';$('output').textContent='Your feedback appears here.';$('status').textContent='';$('reference').hidden=true;$('sampleText').textContent=ex.sample;$('terms').replaceChildren(...ex.terms.map(t=>{const li=document.createElement('li');li.textContent=t.join(' · ');return li;}));$('criterion').textContent=ex.check;updateReview();}
+function refresh(){const ex=current();$('scenario').textContent=ex.task;$('answer').value='';$('output').textContent='Your feedback appears here.';$('status').textContent='';$('reference').hidden=true;$('sampleText').textContent=ex.sample;$('terms').replaceChildren(...ex.terms.map(t=>{const li=document.createElement('li');li.textContent=t.join(' · ');return li;}));$('criterion').textContent=ex.check;const cards=referenceFor(ex.id).map(([title,example,en,ko])=>{const el=document.createElement('article');el.className='grammar-card';for(const [tag,value,lang] of [['h3',title,'en'],['p',example,'de'],['p',en,'en'],['p',ko,'ko']]){const n=document.createElement(tag);n.lang=lang;n.textContent=value;el.append(n);}return el;});$('grammarCards').replaceChildren(...cards);updateReview();}
 function mark(ex){completed.add(ex.id);try{localStorage.setItem('pflege-completed',JSON.stringify([...completed]));}catch{}progress();}
 $('case').onchange=refresh;$('sample').onclick=()=>{$('reference').hidden=!$('reference').hidden;};$('mark').onclick=()=>{mark(current());$('status').textContent='Marked as reviewed (self-study).';};
 refresh();progress();
