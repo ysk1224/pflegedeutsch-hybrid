@@ -113,7 +113,8 @@ test('Chromium desktop: ready before practice, 3 steps, independent checks, revi
   await waitForText(page, '#factResult', /Remove the measurement/);
   await waitForText(page, '#grammarResult', /Use singular/);
   assert.equal(await page.evaluate(() => document.activeElement.id), 'labResultTitle');
-  await page.locator('#labDraft').fill('Die Patientin berichtet über Atemnot beim Gehen. Die SpO₂ beträgt 92 %.');
+  const seededDraft = await page.locator('#labDraft').inputValue();
+  await page.locator('#labDraft').fill(seededDraft.replace('berichten', 'berichtet'));
   await page.getByRole('button', { name: 'Check draft', exact: true }).click();
   await waitForText(page, '#grammarResult', /Curated match/);
   await waitForText(page, '#factResult', /Remove the measurement/);

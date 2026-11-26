@@ -64,6 +64,7 @@ const grammarOnly = {
   patient: ['Ich bekomme schlecht Luft.', 'Beim Gehen bekomme ich gut Luft.'],
   handover: [
     'Die Patientin berichtet über Atemnot.',
+    'Die Patientin berichtet über Atemnot. Die SpO₂ beträgt 92 %.',
     'Die Patientin berichtet über Atemnot beim Gehen. Die SpO₂ beträgt 92 %.',
     'Die Patientin berichtet über Atemnot beim Gehen. Es besteht Verdacht auf eine Pneumonie.'
   ],
