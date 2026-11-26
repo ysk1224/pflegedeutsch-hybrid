@@ -1,0 +1,78 @@
+:root {
+  color-scheme: light;
+  --ink: #162e37;
+  --muted: #455c66;
+  --brand: #05665d;
+  --border: #d5e3e4;
+  --wash: #eff7f5;
+  font: 16px/1.55 system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: #f3f7f7; color: var(--ink); }
+.shell { width: min(100% - 2rem, 72rem); margin-inline: auto; }
+.hero { padding-block: clamp(1.5rem, 4vw, 3rem); background: #103b3c; color: #fff; }
+.hero p { margin: .35rem 0 0; }
+.hero .eyebrow { color: #bde5d9; font-weight: 650; }
+h1 { font-size: clamp(1.9rem, 5vw, 3.1rem); letter-spacing: -.04em; line-height: 1.1; margin: .4rem 0; }
+h2 { font-size: 1.25rem; line-height: 1.25; margin: 0 0 .65rem; }
+h3 { font-size: 1rem; margin: 0 0 .3rem; }
+p { margin: .55rem 0; }
+.layout { display: grid; gap: 1rem; align-items: start; padding-block: 1rem 2rem; }
+.card { min-width: 0; padding: clamp(1rem, 2.5vw, 1.5rem); background: white; border: 1px solid var(--border); border-radius: .9rem; }
+.study { display: grid; gap: 1rem; }
+.study h2 { font-size: 1rem; margin-bottom: .1rem; }
+.study p { margin: .25rem 0; }
+progress { display: block; width: 100%; height: .65rem; accent-color: var(--brand); margin: .45rem 0; }
+.section-heading, .actions { display: flex; flex-wrap: wrap; gap: .55rem; align-items: center; }
+.section-heading { justify-content: space-between; margin-bottom: .9rem; }
+.section-heading h2 { margin: 0; }
+label, legend { display: block; font-weight: 650; }
+select, textarea, button { font: inherit; }
+select, textarea { width: 100%; border: 1px solid #879da0; border-radius: .5rem; padding: .6rem .7rem; color: var(--ink); background: white; }
+select { min-height: 2.75rem; }
+textarea { display: block; resize: vertical; min-height: 8rem; }
+#followAnswer { min-height: 5rem; margin-bottom: .55rem; }
+button { border: 1px solid var(--brand); border-radius: .5rem; min-height: 2.75rem; padding: .45rem .8rem; background: var(--brand); color: white; font-weight: 650; cursor: pointer; }
+button.secondary { background: white; color: var(--brand); }
+button[aria-pressed="true"] { background: var(--wash); }
+button:disabled { opacity: .6; cursor: default; }
+button:hover:not(:disabled) { box-shadow: inset 0 0 0 2px currentColor; }
+:focus-visible { outline: 3px solid #ab510d; outline-offset: 3px; }
+.skip { position: absolute; left: .8rem; top: .8rem; transform: translateY(-180%); background: white; color: var(--brand); padding: .5rem; }
+.skip:focus { transform: none; }
+.notice, .example { padding: .75rem; background: var(--wash); border-radius: .5rem; }
+.muted { color: var(--muted); font-size: .9rem; }
+fieldset { margin: 1rem 0; min-width: 0; border: 1px solid var(--border); border-radius: .55rem; padding: .4rem .75rem .6rem; }
+legend { padding-inline: .25rem; }
+.consent { display: flex; gap: .5rem; align-items: flex-start; min-height: 2.25rem; padding-block: .32rem; cursor: pointer; }
+.consent input { flex: none; margin: .22rem 0 0; width: 1.1rem; height: 1.1rem; accent-color: var(--brand); }
+.status { overflow-wrap: anywhere; }
+.status:empty, #markStatus:empty, #storageStatus:empty { margin: 0; }
+.metrics { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: .45rem; margin-bottom: 0; }
+.metrics div { padding: .5rem; background: var(--wash); border-radius: .5rem; overflow-wrap: anywhere; }
+.metrics dt { font-size: .78rem; color: var(--muted); }
+dd { margin: 0 0 .5rem; }
+.metrics dd { font-weight: 650; margin: 0; }
+.results details { border-top: 1px solid var(--border); margin-top: .75rem; }
+summary { cursor: pointer; font-weight: 650; padding: .7rem 0; }
+.terms { padding-left: 1.25rem; }
+.terms li { padding-bottom: .3rem; }
+.stack > * + * { margin-top: .65rem; }
+.stack:empty { display: none; }
+.response { margin-block: .85rem; overflow-wrap: anywhere; }
+.response p { white-space: pre-wrap; }
+.grammar-card, .error-card { background: #f5faf9; border-radius: .5rem; padding: .7rem; }
+.grammar-card p, .error-card p { margin: .25rem 0; }
+.error-card { background: #fdf5e9; border-inline-start: 3px solid #a65b15; overflow-wrap: anywhere; }
+.grammar-card [lang="de"], .example { font-weight: 600; color: var(--brand); }
+footer { color: var(--muted); font-size: .85rem; padding-bottom: 1.5rem; }
+
+@media (min-width: 48rem) {
+  .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .study { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 30rem) {
+  .actions > button { flex: 1 1 11rem; }
+}

@@ -1,5 +1,110 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PflegeDeutsch Hybrid</title><style>
-*{box-sizing:border-box}body{font:16px/1.6 system-ui,sans-serif;background:#f0f5f5;color:#183344;margin:0}header{background:#133a45;color:white;padding:28px 20px}header div,main{max-width:920px;margin:auto}h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:8px 0}h2{font-size:21px;margin:0 0 12px}main{padding:20px;display:grid;gap:16px}section,aside{background:white;border:1px solid #d5e1e3;border-radius:14px;padding:22px}label{font-weight:600}textarea,select,button{font:inherit;border:1px solid #9db2b8;border-radius:8px;padding:11px}textarea,select{width:100%}textarea{min-height:140px;resize:vertical}button{background:#08776f;color:white;cursor:pointer;margin:5px 5px 5px 0;font-weight:600}button.secondary{background:white;color:#08655e}button:disabled{opacity:.55;cursor:wait}button:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #e8a83f;outline-offset:2px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}small,.muted{color:#52666f}header small{color:#bfe4e1}.tag{font-size:12px;letter-spacing:1.4px;font-weight:700}.notice{background:#eaf6f3;padding:12px;border-radius:8px}progress{width:100%;accent-color:#08776f}footer{padding:0 20px 24px;text-align:center;font-size:13px;color:#52666f}#status{overflow-wrap:anywhere}#reference{border-top:1px solid #d5e1e3;margin-top:15px;padding-top:15px}@media(min-width:800px){main{grid-template-columns:1.2fr 1fr}aside{grid-column:1/-1}}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#103b3c">
+  <title>PflegeDeutsch Hybrid</title>
+  <meta name="description" content="Practise clinical German with fictional B1–B2 nursing scenarios.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="skip" href="#practice">Skip to practice</a>
+  <header class="hero">
+    <div class="shell">
+      <p class="eyebrow">Clinical German · B1–B2</p>
+      <h1>PflegeDeutsch Hybrid</h1>
+      <p>Practise the German you need for a hospital shift.</p>
+    </div>
+  </header>
+  <main class="shell layout">
+    <section class="card" id="practice" aria-labelledby="practice-title">
+      <div class="section-heading">
+        <h2 id="practice-title">Practise a scenario</h2>
+        <button class="secondary" type="button" id="demo">Load demo</button>
+      </div>
+      <label for="case">Scenario</label>
+      <select id="case"></select>
+      <p id="scenario" class="notice"></p>
+      <p id="criterion" class="muted"></p>
 
-header{background:linear-gradient(115deg,#102c39,#135a5b);padding:36px 20px}header div,main{max-width:1120px}main{gap:20px;align-items:start}section,aside{box-shadow:0 6px 24px #1833440b;padding:24px}#output{overflow-wrap:anywhere;line-height:1.55}#output h3{margin:18px 0 8px;padding:8px 12px;background:#e8f4f1;border-left:4px solid #08776f;border-radius:4px;font-size:15px;color:#164e4b}#output p{margin:8px 0 16px}#output h3:first-child{margin-top:0}#status{background:#edf4f6;padding:10px;border-radius:8px;font-size:14px}#status:empty{display:none}#reference li{margin:8px 0}#reviewCount{margin-bottom:4px}button:hover:not(:disabled){filter:brightness(.94)}@media(min-width:800px){main{grid-template-columns:1fr 1.15fr}}@media(prefers-reduced-motion:no-preference){progress{transition:all .2s}}
-header{padding:22px 20px}header p{margin:8px 0}main aside{padding:14px 22px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 16px}main aside p{margin:0}main aside progress,main aside #setup{grid-column:1/-1}main aside #nextReview{grid-column:2;grid-row:4}#grammarPanel{margin-top:24px;padding-top:18px;border-top:1px solid #d5e1e3}.grammar-card{border:1px solid #d5e1e3;border-radius:10px;padding:12px;margin:10px 0;background:#f8fbfa}.grammar-card h3{margin:0;font-size:15px}.grammar-card p{margin:6px 0;font-size:14px}.grammar-card p[lang=de]{font-weight:600;color:#08655e}@media(max-width:500px){main aside{display:block}} .version{font-size:12px;color:#bfe4e1;letter-spacing:.06em}.compact{font-size:13px;margin:6px 0 12px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.metrics>div{border:1px solid #d5e1e3;background:#f7faf9;border-radius:9px;padding:9px;overflow-wrap:anywhere}.metrics strong,.metrics small{display:block}.metrics strong{font-size:15px}.metrics small{font-size:11px;text-transform:uppercase;letter-spacing:.04em}#errorPanel,#followPanel{border-top:1px solid #d5e1e3;margin-top:18px;padding-top:12px}#followAnswer{min-height:85px}#followOutput{white-space:pre-wrap;overflow-wrap:anywhere}#comparison{min-height:18px}.error-card{background:#fff8ee;border-left:3px solid #b77920;padding:9px 12px;margin:8px 0;border-radius:5px;font-size:14px}.error-card p{margin:4px 0}@media(max-width:420px){section,aside{padding:16px}.metrics{grid-template-columns:1fr}} </style></head><body><header><div><small class="tag">LANGUAGE LAB / SIMULATED CASES</small><h1>PflegeDeutsch Hybrid</h1><p>Clinical German practice for internationally trained nurses.</p><span class="version">v0.6 · Hybrid AI learning lab</span></div></header><main><aside><strong>Study progress</strong><p id="progress"></p><progress id="meter" max="12" value="0" aria-label="Exercises reviewed"></progress><p class="muted" id="setup" role="status"></p><p id="reviewCount" class="muted"></p><button class="secondary" id="nextReview">Next review</button></aside><section><h2>01 / Practice</h2><button class="secondary" id="demo">Load demo case</button><p class="muted compact">Try a fictional answer with three deliberate grammar errors.</p><label for="case">Choose a scenario</label><select id="case"></select><p class="notice" id="scenario"></p><label for="answer">Your German response</label><textarea id="answer" maxlength="2000" placeholder="Write your answer in German…"></textarea><p><label><input id="cloud" type="checkbox"> Allow cloud fallback for this fictional exercise</label></p><small>Default: device-only AI. Cloud mode may transmit your answer. Never enter real patient data.</small><p><button id="run">Analyse my German</button><button class="secondary" id="sample">Show / hide reference</button></p><p id="status" role="status" aria-live="polite"></p><div id="metrics" class="metrics" aria-label="Latest AI run"><div><small>Actual source</small><strong id="actualSource">—</strong></div><div><small>First text</small><strong id="firstTime">—</strong></div><div><small>Total</small><strong id="totalTime">—</strong></div></div><p id="comparison" class="muted compact"></p><button class="secondary" id="saveReview">Save scenario for review</button></section><section><h2>02 / Feedback</h2><div id="output" aria-live="polite">Your feedback appears here.</div><div id="errorPanel" hidden><h3>Rule-based grammar checks</h3><p class="muted compact">Limited known patterns, not a complete grammar assessment.</p><div id="errorCards"></div></div><div id="followPanel" hidden><h3>Try the follow-up</h3><p id="followQuestion"></p><label for="followAnswer">Your German answer</label><textarea id="followAnswer" maxlength="1000" rows="3"></textarea><button id="followRun">Check follow-up</button><div id="followOutput" aria-live="polite"></div></div><div id="reference" hidden><h3>Reference answer</h3><p lang="de" id="sampleText"></p><h3>Vocabulary · DE / EN / KO</h3><ul id="terms"></ul><p id="criterion"></p><button class="secondary" id="mark">Mark as reviewed</button></div><div id="grammarPanel"><h2>03 / Grammar reference</h2><p class="muted">Curated examples, independent of AI output. Compare these with the generated feedback.</p><div id="grammarCards"></div><h3>Clinical vs. patient language</h3><div id="clinicalPair" class="grammar-card"></div></div></section></main><footer>Educational simulation only · Not clinical decision support · Only exercise IDs and review flags are saved locally. AI may make errors. Never enter real patient information.</footer><script type="module" src="/src.js"></script></body></html>
+      <form id="practiceForm">
+        <label for="answer">Your German response</label>
+        <textarea id="answer" lang="de" maxlength="2000" placeholder="Schreiben Sie Ihre Antwort …" aria-describedby="privacy status"></textarea>
+        <fieldset id="modePanel">
+          <legend>AI processing</legend>
+          <label class="consent"><input id="cloud" type="checkbox"> Allow cloud fallback for this session’s current case</label>
+          <p class="muted" id="privacy">AI runs on-device by default on supported desktop Chrome. With fallback enabled, your fictional answer may go to Google. Use fictional details only.</p>
+        </fieldset>
+        <p id="setup" class="muted" hidden>The AI service is unavailable in this build. You can still check known patterns and use all reference material.</p>
+        <div class="actions">
+          <button id="run" type="submit">Check my German</button>
+          <button class="secondary" type="button" id="saveReview" aria-pressed="false">Save for review</button>
+        </div>
+        <p id="status" class="muted status" role="status"></p>
+      </form>
+      <dl class="metrics" id="metrics" aria-label="Latest AI response" hidden>
+        <div><dt>Actual source</dt><dd id="actualSource"></dd></div>
+        <div><dt>First text</dt><dd id="firstTime"></dd></div>
+        <div><dt>Total</dt><dd id="totalTime"></dd></div>
+      </dl>
+    </section>
+
+    <section class="card results" aria-labelledby="feedback-title">
+      <h2 id="feedback-title">Feedback and reference</h2>
+      <div id="errorPanel" class="stack" hidden>
+        <h3>Rule-based checks</h3>
+        <div id="errorCards" aria-live="polite"></div>
+      </div>
+      <div id="output" class="stack response" aria-live="polite" hidden></div>
+
+      <details id="reference">
+        <summary>Reference answer and vocabulary</summary>
+        <p lang="de" id="sampleText" class="example"></p>
+        <ul id="terms" class="terms"></ul>
+        <button class="secondary" type="button" id="mark">Mark as reviewed</button>
+        <p id="markStatus" role="status" class="muted"></p>
+      </details>
+      <details id="grammarPanel" open>
+        <summary>Curated grammar · DE / EN / KO</summary>
+        <div id="grammarCards" class="stack"></div>
+      </details>
+      <details>
+        <summary>Clinical and patient language</summary>
+        <dl id="clinicalPair"></dl>
+      </details>
+      <details id="followPanel">
+        <summary>Follow-up practice</summary>
+        <p id="followQuestion"></p>
+        <form id="followForm">
+          <label for="followAnswer">Your German answer</label>
+          <textarea id="followAnswer" lang="de" maxlength="1000" aria-describedby="followStatus"></textarea>
+          <button type="submit" id="followRun">Check follow-up</button>
+          <p id="followStatus" class="muted status" role="status"></p>
+        </form>
+        <div id="followChecks" class="stack" aria-live="polite"></div>
+        <div id="followOutput" class="stack response" aria-live="polite" hidden></div>
+        <details id="followReference">
+          <summary>Example answer</summary>
+          <p lang="de" id="followSample" class="example"></p>
+        </details>
+      </details>
+    </section>
+    <aside class="study card" aria-labelledby="study-title">
+      <div>
+        <h2 id="study-title">Study progress</h2>
+        <p id="progress"></p>
+        <progress id="meter" max="12" value="0" aria-label="Exercises reviewed"></progress>
+      </div>
+      <div>
+        <h2>Review queue</h2>
+        <p id="reviewCount" aria-live="polite"></p>
+        <button class="secondary" type="button" id="nextReview">Open next saved case</button>
+        <p id="storageStatus" class="muted" role="status"></p>
+      </div>
+    </aside>
+  </main>
+  <footer class="shell">Educational simulation only · Use fictional information · Study progress is stored in this browser · v0.7 RC</footer>
+  <script type="module" src="/src.js"></script>
+</body>
+</html>
