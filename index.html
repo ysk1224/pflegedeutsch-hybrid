@@ -9,15 +9,96 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <a class="skip" href="#practice">Skip to practice</a>
+  <a class="skip" href="#integrity">Skip to the lab</a>
   <header class="hero">
     <div class="shell">
       <p class="eyebrow">Clinical German · B1–B2</p>
       <h1>PflegeDeutsch Hybrid</h1>
-      <p>Practise the German you need for a hospital shift.</p>
+      <p>Practise clinical German and keep every case fact intact.</p>
+      <nav aria-label="Practice areas"><a href="#integrity">Integrity Lab</a><a href="#practice">Scenario library</a></nav>
     </div>
   </header>
   <main class="shell layout">
+    <section class="lab" id="integrity" aria-labelledby="lab-title" tabindex="-1">
+      <header class="lab-header">
+        <div>
+          <p class="lab-label">Fictional case · Breathlessness</p>
+          <h2 id="lab-title">Clinical Communication Integrity Lab</h2>
+          <p>Carry the same patient report from everyday German to handover and documentation.</p>
+        </div>
+        <aside class="readiness" aria-label="AI readiness">
+          <strong id="deviceStatus" role="status">Checking on-device support…</strong>
+          <p>Local checks work without an AI model. Cloud coaching is optional and uses the public case only.</p>
+        </aside>
+      </header>
+      <div class="stage-nav" role="group" aria-label="Communication steps">
+        <button type="button" data-stage="patient" aria-current="step">1. Patient voice</button>
+        <button type="button" data-stage="handover">2. Colleague handover</button>
+        <button type="button" data-stage="note">3. Nursing record</button>
+      </div>
+      <p id="labProgress" class="muted lab-progress"></p>
+      <div class="lab-grid">
+        <section class="card case-brief" aria-labelledby="source-title">
+          <h3 id="source-title">Source record</h3>
+          <blockquote id="patientQuote" lang="de"></blockquote>
+          <dl>
+            <dt>Patient report</dt><dd>Breathlessness while walking</dd>
+            <dt>Observations, vital signs and diagnosis</dt><dd>None supplied</dd>
+          </dl>
+          <button class="secondary" type="button" id="judgeTry">Try the handover demo</button>
+          <p class="muted">See how the lab handles an invented oxygen reading and a German verb error.</p>
+        </section>
+        <section class="card lab-work" aria-labelledby="stageTitle">
+          <h3 id="stageTitle" tabindex="-1"></h3>
+          <p id="stageInstruction"></p>
+          <form id="labForm">
+            <label for="labDraft">Your German draft</label>
+            <textarea id="labDraft" lang="de" required maxlength="1000" aria-describedby="stageInstruction" placeholder="Schreiben Sie einen kurzen Satz …"></textarea>
+            <div class="actions lab-actions">
+              <button type="submit">Check draft</button>
+              <button class="secondary" type="button" id="labMistake">Check a practice mistake</button>
+              <button class="secondary" type="button" id="labDevice" disabled hidden>On-device grammar feedback</button>
+            </div>
+          </form>
+          <p id="labDeviceStatus" class="muted status" role="status"></p>
+          <div id="labDeviceOutput" class="stack response" hidden></div>
+          <div id="labReview" class="lab-review" hidden>
+            <h4 id="labResultTitle" tabindex="-1">Draft feedback</h4>
+            <div class="lab-results">
+              <article id="factResult" class="verdict" aria-labelledby="factTitle"><h5 id="factTitle">Case facts</h5><div></div></article>
+              <article id="grammarResult" class="verdict" aria-labelledby="grammarTitle"><h5 id="grammarTitle">German wording</h5><div></div></article>
+            </div>
+            <p id="attemptStatus" class="muted" role="status"></p>
+            <div class="actions">
+              <button class="secondary" type="button" id="reviseDraft">Edit draft</button>
+              <button class="secondary" type="button" id="nextStage">Next step</button>
+            </div>
+          </div>
+          <details id="labReference">
+            <summary>Reference and revision tip</summary>
+            <p id="labTip"></p>
+            <p id="labSample" class="example" lang="de"></p>
+            <button class="secondary" type="button" id="tryReference">Use reference as draft</button>
+          </details>
+        </section>
+      </div>
+      <details class="card coach" id="coachPanel">
+        <summary>Optional cloud coaching · public case only</summary>
+        <p id="coachPrivacy">Cloud coaching sends the fictional source case and your selected topic to Google. Your draft stays in this browser. Coaching is separate from the two draft assessments.</p>
+        <form id="coachForm" aria-describedby="coachPrivacy">
+          <label for="coachTopic">Coaching topic</label>
+          <select id="coachTopic">
+            <option value="attribution">Patient report versus observation</option>
+            <option value="audience">Patient, colleague and record language</option>
+            <option value="concise">Concise nursing notes</option>
+          </select>
+          <label class="consent"><input id="coachConsent" type="checkbox"> I agree to send this public case and topic to Google for this request.</label>
+          <button type="submit" id="coachRun" disabled>Request cloud coaching</button>
+        </form>
+        <p id="coachStatus" class="muted status" role="status"></p>
+        <div id="coachOutput" class="stack response" hidden></div>
+      </details>
+    </section>
     <section class="card" id="practice" aria-labelledby="practice-title">
       <div class="section-heading">
         <h2 id="practice-title">Practise a scenario</h2>
@@ -30,15 +111,14 @@
 
       <form id="practiceForm">
         <label for="answer">Your German response</label>
-        <textarea id="answer" lang="de" maxlength="2000" placeholder="Schreiben Sie Ihre Antwort …" aria-describedby="privacy status"></textarea>
+        <textarea id="answer" lang="de" maxlength="2000" placeholder="Schreiben Sie Ihre Antwort …" aria-describedby="legacyPrivacy"></textarea>
         <fieldset id="modePanel">
           <legend>AI processing</legend>
-          <label class="consent"><input id="cloud" type="checkbox"> Allow cloud fallback for this session’s current case</label>
-          <p class="muted" id="privacy">AI runs on-device by default on supported desktop Chrome. With fallback enabled, your fictional answer may go to Google. Use fictional details only.</p>
+          <p class="muted" id="legacyPrivacy">Phrase checks run in this browser. Optional AI checks your draft on-device when supported. Use fictional details only.</p>
         </fieldset>
-        <p id="setup" class="muted" hidden>The AI service is unavailable in this build. You can still check known patterns and use all reference material.</p>
         <div class="actions">
           <button id="run" type="submit">Check my German</button>
+          <button class="secondary" type="button" id="legacyDevice" disabled hidden>On-device feedback</button>
           <button class="secondary" type="button" id="saveReview" aria-pressed="false">Save for review</button>
         </div>
         <p id="status" class="muted status" role="status"></p>
@@ -79,7 +159,10 @@
         <form id="followForm">
           <label for="followAnswer">Your German answer</label>
           <textarea id="followAnswer" lang="de" maxlength="1000" aria-describedby="followStatus"></textarea>
-          <button type="submit" id="followRun">Check follow-up</button>
+          <div class="actions">
+            <button type="submit" id="followRun">Check follow-up</button>
+            <button class="secondary" type="button" id="followDevice" disabled hidden>On-device feedback</button>
+          </div>
           <p id="followStatus" class="muted status" role="status"></p>
         </form>
         <div id="followChecks" class="stack" aria-live="polite"></div>
@@ -104,7 +187,8 @@
       </div>
     </aside>
   </main>
-  <footer class="shell">Educational simulation only · Use fictional information · Study progress is stored in this browser · v0.7 RC</footer>
+  <footer class="shell">Educational simulation only · Use fictional information · Study progress is stored in this browser · v0.8 Competition Edition</footer>
+  <iframe id="deviceFrame" src="/device.html" title="On-device inference" hidden></iframe>
   <script type="module" src="/src.js"></script>
 </body>
 </html>

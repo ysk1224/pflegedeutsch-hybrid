@@ -5,16 +5,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "test:browser": "node --test tests/browser/*.test.js"
   },
   "dependencies": {
     "firebase": "^12.5.0"
   },
   "devDependencies": {
+    "axe-core": "^4.14.1",
+    "playwright": "^1.65.1",
     "vite": "^7.0.0"
   },
   "overrides": {
     "@grpc/grpc-js": "1.13.7"
   },
-  "version": "0.7.0-rc.1"
+  "version": "0.8.0"
 }

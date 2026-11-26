@@ -1,38 +1,35 @@
 # PflegeDeutsch Hybrid
 
-**Tagline**
-Practise clinical German for a hospital shift with fictional cases, verified grammar notes and device-first AI feedback.
+**Elevator pitch**
+
+Can you hand over a case in German without changing its facts? Practise the patient’s words, a colleague handover and a nursing note with separate feedback on German and fidelity to the case.
 
 **Platform**
+
 Web / Chrome
 
 ## Inspiration
 
-A nurse can know what to communicate during a handover and still hesitate over how to say it in German. The language changes with the audience. A colleague might use *Belastungsdyspnoe*, while a patient might say *Beim Gehen bekomme ich schlecht Luft.* Nurses learning German need a way to practise those differences before using them in a real shift.
+A nurse can know exactly what happened and still hesitate over how to say it in German. A patient might say *Beim Gehen bekomme ich schlecht Luft.* During handover, that becomes an attributed clinical report. In a nursing note, the wording must still make clear where the information came from.
 
 ## What it does
 
-PflegeDeutsch Hybrid gives internationally trained nurses 12 short B1–B2 exercises for handover, patient questions, documentation and speaking to colleagues. Write a German response, compare it with a reference, and work through a follow-up. The exercise includes clinical and patient-friendly German, with English and Korean learning notes.
+The Clinical Communication Integrity Lab follows one fictional patient through three pieces of communication. A learner first writes in the patient’s own voice, then hands over the report to a colleague, then documents it. The lab checks German wording and the supplied case facts separately.
 
-Selected phrase checks explain recurring errors and add the scenario to a review queue. For example, *Haben Sie andere Symptome?* uses the accusative plural after *haben*. *Symptomen* is the dative plural.
+Try the built-in handover mistake. It includes a verb error and an oxygen reading the case never supplied. Fix the verb and the reading still needs revision. Remove the reading, restore the walking trigger and check again to compare the attempts. The nursing note exercise challenges the learner to keep a patient’s report distinct from a direct observation. The lab requests a review when it cannot establish a curated match.
+
+The companion library offers 12 fictional B1–B2 exercises with German references, English and Korean explanations, practice questions and a browser-based review queue.
 
 ## How we built it
 
-We built a small web app with Vite and Firebase AI Logic. The default request mode is `ONLY_ON_DEVICE`. If the learner authorizes cloud fallback for the fictional case, the app uses `PREFER_ON_DEVICE`, giving the Firebase SDK the choice of Chrome’s Gemini Nano when available or the configured Gemini Flash Lite cloud model. The app displays the source reported by the SDK for each valid response. Firebase App Check is integrated through reCAPTCHA Enterprise.
+Firebase AI Logic supports two different kinds of coaching. On supported Chrome devices, Gemini Nano can give draft-specific grammar feedback in a document that blocks network connections. The optional cloud coach uses Gemini on a fixed fictional case and a topic the learner selects. A separate opt-in and Firebase App Check are required. Neither path owns the rubric, and the cloud request never includes the draft.
 
-We give both model paths the same curated grammar references and require a structured German suggestion and short English explanation. The app validates the response before displaying it. Korean explanations and follow-up questions come from the exercise library. The reference and local review tools remain available when AI is unavailable. The app stores reviewed and saved scenario IDs in the browser. It uses fictional practice data.
+The study loop works without an AI model. App labels come from the actual SDK response. Our reproducible Chromium tests use fixture models and intercepted responses to test request boundaries, error handling and the practice flow.
 
 ## Built during the submission period
 
-The public repository history begins on November 26, 2026. During the contest window the project grew into a 12-case study tool with Firebase AI Logic, curated references and bilingual grammar hints. The v0.7 release candidate adds a responsive workflow, structured model output, fixed follow-up exercises, automatic review routing for selected phrase errors and regression coverage. We used standard open-source libraries and an AI coding assistant.
+The public project history starts in November 2026. It grew from a clinical German practice library into a lab for preserving facts across audiences. The competition edition adds separate assessments, revision comparisons, early model readiness and a clearer boundary between private drafts and cloud coaching. We used standard open-source libraries and an AI coding assistant.
 
-## Links
+## Try it
 
-- [Public demo video](https://youtu.be/ZCv-XcwUeQs)
-- [Web app](https://pflegedeutsch-hybrid.web.app)
-- [Public source code](https://github.com/ysk1224/pflegedeutsch-hybrid)
-- [Judge testing instructions](docs/ARCHITECTURE.md#judge-test-steps)
-
-## Live demo verification
-
-The hosted v0.7 release candidate was tested with the same fictional ICU handover in two environments. With cloud fallback off on supported desktop Chrome, the app reported `On-device`. In a browser without the local model, the app displayed the device-only availability message and then reported `Cloud` after fallback was enabled for the fictional case. The public demo shows both workflows.
+Open the demo and click **Try the handover demo**. Inspect **Case facts** and **German wording**, revise the sentence and check it again. No account is required for the lab. Desktop Chrome with the English/German model ready can also test on-device coaching. The configured preview can test optional cloud coaching. See the [judge walkthrough](docs/ARCHITECTURE.md#judge-walkthrough) and [evidence record](docs/VERIFICATION.md).

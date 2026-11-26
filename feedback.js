@@ -31,12 +31,6 @@ export function sourceKind(source) {
   return 'unknown';
 }
 
-export function verifiedSource(source, allowCloud) {
-  const kind = sourceKind(source);
-  if (!allowCloud && kind === 'cloud') throw new Error('unexpected-source');
-  return kind;
-}
-
 export function withDeadline(work, milliseconds, onTimeout = () => {}) {
   let timer;
   const deadline = new Promise((_, reject) => {
@@ -49,14 +43,26 @@ export function withDeadline(work, milliseconds, onTimeout = () => {}) {
 }
 
 export function feedbackError(error, allowCloud) {
+  if (error.message === 'device-unavailable' || error.message === 'device-not-configured') {
+    return 'A compatible on-device model is not ready. Your draft and the built-in checks are still available.';
+  }
+  if (error.message === 'cloud-not-configured') {
+    return 'Cloud coaching is unconfigured in this build. Use the case reference to continue.';
+  }
+  if (error.message === 'cloud-consent-required') {
+    return 'Allow the public practice prompt before starting cloud coaching.';
+  }
   if (error.message === 'feedback-timeout') {
     return 'The AI request timed out. Your answer is still here. Use the reference or try again.';
+  }
+  if (error.message === 'unverified-example') {
+    return 'The AI example could not be matched to the case. Use the curated reference to continue.';
   }
   if (error.message === 'feedback-format' || error.message === 'unexpected-source') {
     return 'AI feedback could not be verified. Compare your answer with the reference or try again.';
   }
   if (!allowCloud && /unsupported|api-not-enabled/i.test(error.code ?? '')) {
-    return 'On-device AI is unavailable in this browser. Use the reference or enable cloud fallback for fictional practice.';
+    return 'On-device AI is unavailable in this browser. Use the built-in checks and case reference.';
   }
   if (/429|quota|resource.exhausted/i.test(error.message ?? '')) {
     return 'The AI quota is temporarily unavailable. You can continue with the reference and grammar checks.';
