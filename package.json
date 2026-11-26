@@ -15,5 +15,6 @@
   },
   "overrides": {
     "@grpc/grpc-js": "1.13.7"
-  }
+  },
+  "version": "0.7.0-rc.1"
 }
