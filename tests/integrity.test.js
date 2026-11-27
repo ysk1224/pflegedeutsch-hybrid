@@ -121,3 +121,9 @@ test('uncertain drafts are held, and the fact verdict is separate from wording',
   assert.equal(revised.factual.state, 'verified');
   assert.equal(revised.grammar.state, 'review');
 });
+
+
+test('Unicode word boundaries do not lose walking or infer a third-person pronoun inside außer', () => {
+  assert.equal(assessIntegrity('Zu Fuß werde ich kurzatmig.', 'patient').factual.state, 'verified');
+  assert.equal(assessIntegrity('Wenn ich spazieren gehe, gerate ich außer Atem.', 'patient').factual.state, 'verified');
+});

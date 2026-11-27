@@ -1,8 +1,8 @@
 // These rules describe only the supplied breathlessness case. Vocabulary is
 // checked independently from the three facts so novel sentence order can work
 // while unrecognised content stays unverified.
-const symptom = /\b(?:atemnot|luftnot|(?:belastungs)?dyspnoe|atemprobleme|atemnotgefühl|kurzatmig(?:keit)?|atemlos(?:igkeit)?|(?:schlecht|wenig|kaum|schwer) luft|außer atem|nach luft (?:ringen|schnappen)|(?:probleme|schwierigkeiten) (?:beim|mit dem) atmen|mühe (?:beim|mit dem|zu) atmen|luft (?:fehlt|fehle)|(?:fehlt|fehle) (?:mir|ihr|ihm) (?:die )?luft|(?:das )?atmen (?:fällt|falle) (?:mir |ihr |ihm )?schwer|(?:fällt|falle) (?:mir|ihr|ihm) (?:das )?atmen schwer|schwer (?:zu )?atmen|(?:das )?atmen schwerf(?:ällt|alle)|f(?:ällt|alle) (?:der patientin|dem patienten) (?:das )?atmen schwer)\b/u;
-const walking = /\b(?:gehbelastung|(?:beim|während des|während dem|durch das|beim kurzen) (?:gehen|spazieren(?:gehen)?|fußweg)|(?:zu|beim) fuß(?: gehen)?|(?:wenn|sobald|während) (?:ich|sie|er) (?:gehe|geht|spazieren gehe|spazieren geht)|(?:beim|während) spazieren gehen|(?:zu|beim) fuß unterwegs|beim gang|vom gehen|gehen (?:macht|bereitet|verursacht|löst))\b/u;
+const symptom = /\b(?:atemnot|luftnot|(?:belastungs)?dyspnoe|atemprobleme|atemnotgefühl|kurzatmig(?:keit)?|atemlos(?:igkeit)?|(?:schlecht|wenig|kaum|schwer) luft|außer atem|nach luft (?:ringen|schnappen)|(?:probleme|schwierigkeiten) (?:beim|mit dem) atmen|mühe (?:beim|mit dem|zu) atmen|luft (?:fehlt|fehle)|(?:fehlt|fehle) (?:mir|ihr|ihm) (?:die )?luft|(?:das )?atmen (?:fällt|falle) (?:mir |ihr |ihm )?schwer|(?:fällt|falle) (?:mir|ihr|ihm) (?:das )?atmen schwer|schwer (?:zu )?atmen|(?:das )?atmen schwerf(?:ällt|alle)|f(?:ällt|alle) (?:(?:der patientin|dem patienten) )?(?:das )?atmen schwer)\b/u;
+const walking = /(?<!\p{L})(?:gehbelastung|(?:beim|während des|während dem|durch das|beim kurzen) (?:gehen|spazieren(?:gehen)?|fußweg)|(?:zu|beim) fuß(?: gehen)?|(?:wenn|sobald|während) (?:ich|sie|er) (?:gehe|geht|spazieren gehe|spazieren geht)|(?:beim|während) spazieren gehen|(?:zu|beim) fuß unterwegs|beim gang|vom gehen|gehen (?:macht|bereitet|verursacht|löst))(?!\p{L})/u;
 const reported = /\b(?:bericht(?:et|en)|schilder(?:t|n)|beschreib(?:t|en)|erklär(?:t|en)|sagt|äußert|klagt|erwähnt|mitteilt|meldet|gibt[^.!?;]*\ban\b|(?:laut|gemäß) (?:der |dem )?patient(?:in|en)?|(?:nach|laut|gemäß) (?:eigenen|ihren|seinen) angaben|(?:nach|laut|gemäß) (?:aussage|angaben) (?:der patientin|des patienten)|patientenangabe[n]?|eigenangabe[n]?|subjektiv|anamnestisch)\b/u;
 const clinicalMeasure = /\b(?:spo[2₂]|sauerstoffsättigung|atemfrequenz|atemzüge|puls|herzfrequenz|blutdruck|temperatur|fieber|sättigung|blutzucker|glukose|systolisch|diastolisch)\b/u;
 const units = /\d+(?:[.,]\d+)?\s*(?:%|\/\s*min\b|atemzüge\b|mmhg\b|°\s*c\b|mg\s*\/\s*dl\b|mmol\s*\/\s*l\b|bpm\b)/u;
@@ -90,12 +90,13 @@ export function assessCaseFacts(text, stageId, knownAnswer) {
     }
   }
 
+  const otherPerson = new Set(['sie', 'er', 'ihr', 'ihm', 'patient', 'patientin', 'patienten']);
   const completeClause = clauses.some((clause, index) => {
     const { symptom, walking, source } = facts[index];
     const attributed = source && (patient.test(clause) || /\b(?:patientenangaben?|eigenangaben?|subjektiv|eigene[nr]? angaben)\b/u.test(clause));
     const quote = /["„“»«]/u.test(clause);
     const perspective = stageId === 'patient'
-      ? firstPerson.test(clause) && !source && !/\b(?:sie|er|ihr|ihm|patient(?:in|en)?)\b/u.test(clause)
+      ? firstPerson.test(clause) && !source && !content(clause).some(word => otherPerson.has(word))
       : attributed && (!firstPerson.test(clause) || quote);
     return symptom && walking && perspective && !ambiguousTiming.test(clause);
   });
