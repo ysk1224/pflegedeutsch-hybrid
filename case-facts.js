@@ -3,7 +3,7 @@
 // while unrecognised content stays unverified.
 const symptomPatterns = [
   /\b(?:atemnot|luftnot|(?:belastungs)?dyspnoe|atem(?:probleme|beschwerden|notgefühl)|kurzatmig(?:keit)?|atemlos(?:igkeit)?)\b/u,
-  /\b(?:außer atem|(?:schlecht|wenig|kaum|schwer) luft|luft (?:fehlt|fehle)|(?:fehlt|fehle) (?:mir|ihr|ihm) (?:die )?luft)\b/u,
+  /\b(?:außer atem|(?:schlecht|wenig|kaum|schwer) luft|luft (?:fehlt|fehle)|(?:fehlt|fehle) (?:mir|ihr|ihm) (?:die )?luft|(?:geht|gehe) (?:mir|ihr|ihm) die luft aus)\b/u,
   /\b(?:nach luft (?:zu )?(?:ringen|schnappen)|(?:ringen?|ringt|schnappen?|schnappt) (?:(?:ich|sie|er) )?nach luft)\b/u,
   /\b(?:(?:probleme|schwierigkeiten) (?:beim|mit dem) atmen|mühe (?:beim|mit dem|zu) atmen)\b/u,
   /\b(?:(?:schwer|mühsam) (?:zu )?atmen|atm(?:e|et|en) (?:(?:ich|sie|er) )?(?:schwer|mühsam))\b/u,
@@ -16,7 +16,7 @@ const clinicalMeasure = /(?<!\p{L})(?:spo[2₂]|sauerstoffsättigung|atemfrequen
 const units = /\d+(?:[.,]\d+)?\s*(?:%|prozent\b|\/\s*min\b|atemzüge\b|mmhg\b|°\s*c\b|mg\s*\/\s*dl\b|mmol\s*\/\s*l\b|bpm\b)/u;
 const numeric = /\d/u;
 const spelledValue = /\b(?:null|eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|zwanzig|dreißig|vierzig|fünfzig|sechzig|siebzig|achtzig|neunzig|hundert|[a-zäöüß]+und(?:zwanzig|dreißig|vierzig|fünfzig|sechzig|siebzig|achtzig|neunzig))\b/u;
-const diagnosis = /\b(?:asthma|asthmaanfall|pneumonie|lungenentzündung|lungenembolie|copd|herzinsuffizienz|lungenödem|bronchitis|pneumothorax|anämie|hyperventilation|infekt|hypoxämie|respiratorische insuffizienz)\b|\bdiagnose\s*:/u;
+const diagnosis = /\b(?:asthma|asthmaanfall|pneumonie|lungenentzündung|lungenembolie|copd|herzinsuffizienz|lungenödem|bronchitis|pneumothorax|anämie|hyperventilation|infekt(?:e[sn]?|s)?|hypoxämie|respiratorische insuffizienz)\b|\bdiagnose\s*:/u;
 const observation = /\b(?:beobachtet(?:e|en)?|objektiv|festgestellt|sichtbar|gemessen|zeigte(?:n)?|(?:wir|ich) (?:sahen|sah|beobachteten|beobachtete)|auffällig)\b/u;
 const altered = /\b(?:in ruhe|ohne belastung|im (?:liegen|sitzen|schlaf)|beim (?:liegen|sitzen|treppensteigen|rennen|joggen|radfahren)|(?:im|beim) (?:schlafen|stehen)|nach dem gehen|nach belastung|beim sport)\b/u;
 const ambiguousTiming = /\b(?:berichtet|schildert|beschreibt|sagt|klagt|äußert|erklärt|meldet|erwähnt) (?:beim|während des) (?:gehen|spazieren\w*)\b/u;
@@ -32,9 +32,9 @@ const coreWords = new Set((
   'gehbelastung gehen gehens gehe geht spazieren spazierengehen spaziergang spaziergangs fuß fußweg fußwegs gang unterwegs ' +
   'patient patientin patienten patientenangabe patientenangaben eigenangabe eigenangaben subjektiv anamnestisch ' +
   'berichtet berichten schildert schildern beschreibt beschreiben erklärt erklären sagt äußert klagt erwähnt meldet gibt an teilt mit ' +
-  'laut nach gemäß eigenen ihren seinen aussage angabe angaben ' +
+  'laut nach gemäß eigenen ihren seinen aussage angabe angaben eines ' +
   'bekomme bekommt bekommen kriege kriegt kriegen fehlt fehle komme kommt kommen werde wird werden bin ist sei gerate gerät geraten ' +
-  'trete tritt auftreten auf auftritt auftrete fällt falle fallen schwerfällt schwerfalle atme atmet zu habe hat haben hätte ' +
+  'trete tritt auftreten auftretend auftretende auftretenden auf aus auftritt auftrete fällt falle fallen schwerfällt schwerfalle atme atmet zu habe hat haben hätte muss müsse ' +
   'besteht bestehen verspüre verspürt leide leidet merke merkt empfinde empfindet ringe ringt ringen schnappen schnappe schnappt ' +
   'probleme schwierigkeiten mühe schlecht wenig kaum schwer mühsam macht machen bereitet verursacht löst eintritt verspüren empfinden fühlt fühle ' +
   'ich mich mir ihr ihm sie er ihre seine der die das dem des den ein eine einer einem ' +
@@ -58,9 +58,12 @@ function splitClauses(text) {
 }
 
 function getFacts(clause) {
+  const walkingCue = walking.test(clause) || /\b(?:während (?:des )?(?:gehens|spazierengehens)|(?:beim|auf (?:dem|einem)|während (?:des|eines)) (?:spaziergangs?|fußwegs?))\b/u.test(clause);
+  // Walking can sit between the respiratory predicate and its complement.
+  const breathingFrame = /\b(?:atmen (?:beim|während des) (?:gehen|gehens|spazierengehen) (?:schwer|mühsam)|(?:beim|während des) (?:gehen|gehens|spazierengehen) (?:auftretend\p{L}*|einsetzend\p{L}*) (?:atemnot|luftnot|kurzatmigkeit|dyspnoe))\b/u;
   return {
-    symptom: hasSymptom(clause),
-    walking: walking.test(clause) || /\bwährend (?:des )?(?:gehens|spazierengehens)\b/u.test(clause) || /\b(?:beim|auf (?:dem|einem)|während (?:des|eines)) (?:spaziergangs?|fußwegs?)\b/u.test(clause),
+    symptom: hasSymptom(clause) || breathingFrame.test(clause),
+    walking: walkingCue,
     source: reported.test(clause) || /^patient(?:in)?\s*:/u.test(clause) ||
       /\bteilt\b[^.!?;]*\bmit\b/u.test(clause)
   };
@@ -109,7 +112,7 @@ export function assessCaseFacts(text, stageId, knownAnswer) {
     // An unsupported phrase cannot by itself establish an omission.
     if (describesSymptom && !describesWalking) {
       add('trigger-unconfirmed', 'Add when the patient becomes breathless: while walking.');
-    } else if (describesWalking && !describesSymptom) {
+    } else if (describesWalking && !describesSymptom && !/\b(?:luft|atem|atmen|atme|atmet)\b/u.test(text)) {
       add('symptom-unconfirmed', 'Add that the patient reported breathlessness.');
     } else if (describesSymptom && describesWalking && !correctPerspective) {
       if (stageId !== 'patient' && !patient.test(text) && !firstPerson.test(text)) {
@@ -131,7 +134,8 @@ export function assessCaseFacts(text, stageId, knownAnswer) {
     const perspective = stageId === 'patient'
       ? firstPerson.test(clause) && !source && !content(clause).some(word => otherPerson.has(word))
       : firstPerson.test(clause) ? singleSourceQuote : attributed;
-    return symptom && walking && perspective && !ambiguousTiming.test(clause);
+    const explicitOnset = /\b(?:beim|während des) (?:gehen|gehens|spazieren(?:gehen)?) (?:auftretend|einsetzend)\p{L}*\b/u.test(clause);
+    return symptom && walking && perspective && (!ambiguousTiming.test(clause) || explicitOnset);
   });
   return { issues, verified: !issues.length && (knownAnswer || (supported && clauses.length === 1 && completeClause)) };
 }
