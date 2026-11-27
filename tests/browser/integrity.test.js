@@ -46,7 +46,8 @@ async function fixture(t, settings = {}) {
   t.after(() => context.close());
   const external = [];
   const cloud = [];
-  let respond = { choice: 'A' };
+  const drill = { first: 'Die Patientin schildert Luftnot beim Spazieren.', second: 'Eigenangabe: Luftnot beim Spazieren.' };
+  let respond = drill;
   let allowAttestation = true;
   await context.route('**/*', async route => {
     const request = route.request();
@@ -75,11 +76,12 @@ async function fixture(t, settings = {}) {
     }
     if (target.hostname === 'firebasevertexai.googleapis.com') {
       cloud.push({ body: request.postData(), headers: request.headers() });
-      if (respond === 429) return route.fulfill({ status: 429, headers, json: { error: { message: 'Quota exceeded' } } });
+      const modelReply = typeof respond === 'function' ? respond() : respond;
+      if (modelReply === 429) return route.fulfill({ status: 429, headers, json: { error: { message: 'Quota exceeded' } } });
       return route.fulfill({
         headers,
         contentType: 'text/event-stream',
-        body: `data: ${JSON.stringify({ candidates: [{ content: { role: 'model', parts: [{ text: JSON.stringify(respond) }] } }] })}\n\n`
+        body: `data: ${JSON.stringify({ candidates: [{ content: { role: 'model', parts: [{ text: JSON.stringify(modelReply) }] } }] })}\n\n`
       });
     }
     return route.abort();
@@ -89,7 +91,7 @@ async function fixture(t, settings = {}) {
   page.on('pageerror', error => uncaught.push(error.message));
   t.after(() => assert.deepEqual(uncaught, []));
   return {
-    page, external, cloud,
+    page, external, cloud, drill,
     setResponse: value => { respond = value; },
     denyAttestation: () => { allowAttestation = false; }
   };
@@ -121,14 +123,14 @@ test('Chromium desktop: ready before practice, 3 steps, independent checks, revi
   await page.getByText('Reference and revision tip', { exact: true }).click();
   await page.getByRole('button', { name: 'Use reference as draft' }).click();
   await page.getByRole('button', { name: 'Check draft', exact: true }).click();
-  await waitForText(page, '#attemptStatus', /Attempt 3 .*Case facts: now matches/);
+  await waitForText(page, '#attemptStatus', /Attempt 3 .*Case facts: now passes/);
   await page.getByRole('button', { name: 'Next step' }).click();
   await page.getByRole('button', { name: 'Check a practice mistake' }).click();
-  await waitForText(page, '#factResult', /your observation/);
+  await waitForText(page, '#factResult', /your own observation/);
   await page.getByRole('button', { name: '1. Patient voice' }).click();
   await page.getByRole('button', { name: 'Check a practice mistake' }).click();
-  await waitForText(page, '#factResult', /walking trigger/);
-  await page.locator('#labDraft').fill('Beim Spazieren gerate ich außer Atem.');
+  await waitForText(page, '#factResult', /when the patient becomes breathless/);
+  await page.locator('#labDraft').fill('Wenn ich aus dem Haus trete, wird mir das Einatmen mühsam.');
   await page.getByRole('button', { name: 'Check draft', exact: true }).click();
   await waitForText(page, '#factResult', /Needs review/);
   await page.getByRole('button', { name: 'Load demo', exact: true }).click();
@@ -148,7 +150,7 @@ test('Chromium desktop: ready before practice, 3 steps, independent checks, revi
 });
 
 test('Chromium request capture: no external traffic before consent; cloud sends only public data', async t => {
-  const { page, external, cloud, setResponse } = await fixture(t);
+  const { page, external, cloud, drill, setResponse } = await fixture(t);
   await page.goto(url);
   await waitForText(page, '#deviceStatus', /unsupported|unavailable/);
   await page.locator('#labDraft').fill(sentinel);
@@ -165,30 +167,44 @@ test('Chromium request capture: no external traffic before consent; cloud sends 
   await page.locator('#coachConsent').check();
   await page.locator('#coachRun').click();
   await waitForText(page, '#coachStatus', /Cloud AI/);
-  assert.match(await page.locator('#coachOutput').innerText(), /Document the source concisely/);
+  assert.match(await page.locator('#coachOutput').innerText(), /Colleague handover/);
+  assert.match(await page.locator('#coachOutput').innerText(), /Nursing record/);
+  await page.getByRole('button', { name: 'beim Spazieren', exact: true }).click();
+  assert.match(await page.locator('#coachOutput').innerText(), /Try again/);
+  await page.getByRole('button', { name: 'Eigenangabe', exact: true }).click();
+  assert.match(await page.locator('#coachOutput').innerText(), /Correct/);
   assert.doesNotMatch(await page.locator('#coachOutput').innerText(), /nominative case/);
   assert.equal(await page.locator('#coachConsent').isChecked(), false);
   assert.equal(cloud.length, 1);
   assert.match(cloud[0].body, /breathlessness while walking/);
-  assert.match(cloud[0].body, /concise nursing note/);
-  assert.match(cloud[0].body, /Patientenangabe/);
-  assert.deepEqual(JSON.parse(cloud[0].body).generationConfig.responseSchema.properties.choice.enum, ['A', 'B']);
+  assert.match(cloud[0].body, /brief source-attributed nursing note/);
+  assert.match(cloud[0].body, /Eigenangabe/);
+  assert.deepEqual(JSON.parse(cloud[0].body).generationConfig.responseSchema.required, ['first', 'second']);
   assert.equal(cloud[0].headers['x-firebase-appcheck'], 'fixture-app-check-token');
   assert.ok(external.every(item => !JSON.stringify(item).includes(sentinel)));
   assert.equal(await page.locator('#labDraft').inputValue(), sentinel);
   await page.locator('#coachForm').evaluate(form => form.dispatchEvent(new SubmitEvent('submit', { cancelable: true })));
   assert.equal(cloud.length, 1);
 
-  setResponse({ german: 'Die Sauerstoffsättigung beträgt 80 %.', english: 'Invented measurement' });
+  let attempts = 0;
+  setResponse(() => ++attempts === 1 ? { first: drill.first, second: 'Sauerstoffsättigung 80 %.' } : drill);
   await page.locator('#coachConsent').check();
   await page.locator('#coachRun').click();
-  await waitForText(page, '#coachStatus', /could not be verified/);
+  await waitForText(page, '#coachStatus', /Cloud AI/);
+  assert.equal(attempts, 2);
+  assert.match(cloud[2].body, /format repair/);
+  assert.doesNotMatch(cloud[2].body, /80 %/);
+
+  setResponse({ first: drill.first, second: 'Sauerstoffsättigung 80 %.' });
+  await page.locator('#coachConsent').check();
+  await page.locator('#coachRun').click();
+  await waitForText(page, '#coachStatus', /could not be matched/);
   assert.equal(await page.locator('#coachOutput').isVisible(), false);
   setResponse(429);
   await page.locator('#coachConsent').check();
   await page.locator('#coachRun').click();
   await waitForText(page, '#coachStatus', /quota/);
-  assert.equal(cloud.length, 3);
+  assert.equal(cloud.length, 6);
   assert.equal(await page.locator('#coachConsent').isEnabled(), true);
   assert.ok(external.every(item => !JSON.stringify(item).includes(sentinel)));
 });

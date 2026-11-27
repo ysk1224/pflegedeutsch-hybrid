@@ -1,3 +1,5 @@
+import { assessCaseFacts } from './case-facts.js';
+
 export const caseFacts = 'The patient reports breathlessness while walking. No examination findings, vital signs, or diagnosis are supplied.';
 export const patientQuote = 'Beim Gehen bekomme ich schlecht Luft.';
 
@@ -50,14 +52,6 @@ export const integrityStages = [
   }
 ];
 
-const symptom = /\b(?:atemnot|luftnot|dyspnoe|(?:schlecht|kaum) luft|kurzatmig)\b/u;
-const walking = /\b(?:beim gehen|wenn ich gehe|wenn (?:sie|er) geht|beim laufen|zu fuß)\b/u;
-const report = /\b(?:berichtet?|berichten|gibt(?:\s+\w+){0,7}\s+an|laut (?:der |dem )?patient(?:in|en)?|patientenangabe|subjektiv)\b/u;
-const measured = /\b(?:spo(?:2|₂)|sauerstoffsättigung|atemfrequenz|atemzüge|puls|blutdruck|temperatur|sättigung)\b/u;
-const value = /\d+(?:[.,]\d+)?\s*(?:%|\/\s*min\b|atemzüge\b|mmhg\b|°c\b)/u;
-const diagnosis = /\b(?:asthma|pneumonie|lungenembolie|copd|herzinsuffizienz|infekt|diagnose)\b/u;
-const qualification = /\b(?:kein(?:e|en|er)?|nicht|unklar|unbekannt|fraglich|möglicherweise)\b/u;
-const observation = /\b(?:beobachtet|objektiv|festgestellt|sichtbar|gemessen)\b/u;
 // These strings are examples of grammatical wording with incomplete or invented
 // information. Recognition here never changes the separate clinical assessment.
 const grammarOnly = {
@@ -101,47 +95,6 @@ function result(issues, verified, messages) {
   return { state: 'verified', issues, summary: messages.verified };
 }
 
-function assessFacts(input, stage, recognized) {
-  const text = normalize(input);
-  const symptomsPresent = symptom.test(text);
-  const walkingPresent = walking.test(text);
-  const issues = [];
-  const add = (id, text) => issues.push({ id, text });
-  const clauses = text.split(/[;!?]|\.(?!\d)|,\s+(?=(?:die|der|objektiv|spo|atemfrequenz)\b)/u);
-  if (value.test(text) || clauses.some(clause => measured.test(clause) && /\d+(?:[.,]\d+)?/u.test(clause) &&
-      /\d/u.test(clause.replace(/spo[2₂]/gu, '')))) {
-    add('measurement', 'Remove the measurement. The case supplies no vital signs or numeric findings.');
-  }
-  if (clauses.some(clause => diagnosis.test(clause) && !qualification.test(clause))) {
-    add('diagnosis', 'Remove the diagnosis or diagnostic claim. The case supplies only the patient’s report.');
-  }
-  if (clauses.some(clause => observation.test(clause) && symptom.test(clause) && !qualification.test(clause))) {
-    add('observation', 'Breathlessness is reported by the patient. Do not record it as your observation or a measured finding.');
-  }
-  if (clauses.some(clause => /\b(?:in ruhe|beim liegen|beim sitzen)\b/u.test(clause) && symptom.test(clause) &&
-      !qualification.test(clause))) {
-    add('changed-trigger', 'The patient described breathlessness while walking. The case supplies no symptoms at rest.');
-  }
-
-  if (symptomsPresent && !walkingPresent) {
-    add('trigger-unconfirmed', 'Walking is not clear in the supported phrases. Check that your draft includes the walking trigger.');
-  }
-  if (walkingPresent && !symptomsPresent) {
-    add('symptom-unconfirmed', 'The symptom is not clear in the supported phrases. Check that your draft mentions breathlessness.');
-  }
-  if (stage.id !== 'patient' && symptomsPresent && !report.test(text)) {
-    add('attribution-unconfirmed', 'Make the source explicit: the patient reported the symptom.');
-  }
-  if (stage.id === 'patient' && symptomsPresent && report.test(text) && !/\bich\b/u.test(text)) {
-    add('patient-perspective', 'Use the patient’s first-person perspective for this step.');
-  }
-  return result(issues, recognized, {
-    revise: 'Compare these items with the supplied case.',
-    review: 'The rule check cannot confirm factual preservation for this wording. Compare with the case and reference.',
-    verified: 'Matches a curated factual answer for this case and step.'
-  });
-}
-
 export function assessIntegrity(input, stageId) {
   const stage = integrityStages.find(item => item.id === stageId);
   if (!stage || typeof input !== 'string' || !input.trim()) throw new Error('Enter a German draft first.');
@@ -151,8 +104,13 @@ export function assessIntegrity(input, stageId) {
     ? [{ id: `grammar-${index}`, text }]
     : []);
 
+  const facts = assessCaseFacts(normalize(input), stage.id, form.recognizesFacts);
   return {
-    factual: assessFacts(input, stage, form.recognizesFacts),
+    factual: result(facts.issues, facts.verified, {
+      revise: 'The draft contains a detectable issue with the supplied case facts.',
+      review: 'This wording is outside the fact check or a detail cannot be confirmed. Compare it with the source and reference.',
+      verified: 'The supported wording preserves breathlessness, walking and the source for this step.'
+    }),
     grammar: result(grammarIssues, form.matchesForm, {
       revise: 'A supported German grammar pattern needs revision.',
       review: 'No automatic grammar verdict for this wording. Compare with the reference or request on-device feedback.',
@@ -168,7 +126,7 @@ export function compareAttempts(previous, current) {
     const before = previous[key];
     const after = current[key];
     if (after.state === 'verified' && before.state !== 'verified') {
-      changes.push(`${label}: now matches a curated answer.`);
+      changes.push(`${label}: now passes the supported checks.`);
     } else if (before.state === after.state &&
         before.issues.map(issue => issue.id).join() === after.issues.map(issue => issue.id).join()) {
       changes.push(`${label}: the supported checks are unchanged.`);

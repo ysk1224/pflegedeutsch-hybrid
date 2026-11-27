@@ -23,7 +23,8 @@ function renderVerdict(id, verdict) {
   const target = $(id);
   const panel = target.querySelector('div');
   target.dataset.verdict = verdict.state;
-  panel.replaceChildren(textNode('strong', headings[verdict.state]), textNode('p', verdict.summary));
+  const heading = id === 'factResult' && verdict.state === 'verified' ? 'Facts preserved' : headings[verdict.state];
+  panel.replaceChildren(textNode('strong', heading), textNode('p', verdict.summary));
   if (verdict.issues.length) {
     const list = textNode('ul', '');
     list.append(...verdict.issues.map(issue => textNode('li', issue.text)));
@@ -38,7 +39,7 @@ function renderReview() {
     return text === record.checkedDraft && record.latest?.factual.state === 'verified' &&
       record.latest.grammar.state === 'verified';
   }).length;
-  $('labProgress').textContent = `${completed} of ${integrityStages.length} steps match the curated wording and facts`;
+  $('labProgress').textContent = `${completed} of ${integrityStages.length} steps pass both supported checks`;
   const record = progress.get(stage.id);
   $('labReview').hidden = !record.latest;
   if (!record.latest) return;
@@ -157,6 +158,32 @@ $('labDevice').addEventListener('click', async () => {
   }
 });
 
+function showCloudDrill(output, drill) {
+  const examples = document.createElement('ol');
+  for (const line of drill.lines) {
+    const example = document.createElement('li');
+    example.append(textNode('strong', line.title), textNode('p', line.sentence, 'de'));
+    examples.append(example);
+  }
+  const options = document.createElement('div');
+  options.className = 'actions';
+  const feedback = document.createElement('p');
+  feedback.setAttribute('role', 'status');
+  for (const choice of drill.options) {
+    const button = textNode('button', choice, 'de');
+    button.type = 'button';
+    button.className = 'secondary';
+    button.addEventListener('click', () => {
+      feedback.textContent = choice === drill.answer
+        ? `Correct. ${drill.guidance}`
+        : 'Compare what the phrase tells you: source, symptom or trigger. Try again.';
+    });
+    options.append(button);
+  }
+  output.replaceChildren(examples, textNode('p', drill.question), options, feedback);
+  output.hidden = false;
+}
+
 function syncCoachControls() {
   $('coachRun').disabled = !cloudConfigured || cloudBusy || !$('coachConsent').checked;
   $('coachConsent').disabled = !cloudConfigured || cloudBusy;
@@ -183,7 +210,7 @@ $('coachForm').addEventListener('submit', async event => {
   status.textContent = 'Requesting cloud coaching…';
   try {
     const result = await request;
-    showSuggestion(output, result.feedback.german, [result.feedback.english]);
+    showCloudDrill(output, result.feedback);
     status.textContent = 'Cloud AI · Public-case coaching';
   } catch (error) {
     status.textContent = feedbackError(error, true);

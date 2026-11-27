@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPublicCoachPrompt, readPublicCoachChoice, requestPublicCoaching } from '../cloud-coach.js';
+import { buildPublicCoachPrompt, requestPublicCoaching } from '../cloud-coach.js';
+import { readPublicCoachDrill } from '../cloud-drill.js';
 import { readDeviceAvailability } from '../inference.js';
 import { assessIntegrity, buildIntegrityLanguagePrompt, compareAttempts, integrityStages } from '../integrity.js';
 
@@ -14,7 +15,7 @@ test('all stages have curated reference matches and their demos expose the inten
     const revised = assessIntegrity(stage.sample, stage.id);
     assert.equal(revised.factual.state, 'verified');
     assert.equal(revised.grammar.state, 'verified');
-    assert.match(compareAttempts(demo, revised), /Case facts: now matches/);
+    assert.match(compareAttempts(demo, revised), /Case facts: now passes/);
   }
 });
 
@@ -26,7 +27,6 @@ test('fluent wording can contain unsupported measurements or lack attribution', 
   const note = assessIntegrity('Atemnot beim Gehen beobachtet.', 'note');
   assert.equal(note.grammar.state, 'verified');
   assert.ok(hasIssue(note.factual, 'observation'));
-  assert.ok(hasIssue(note.factual, 'attribution-unconfirmed'));
 });
 
 test('the facts can match while a grammar rule still flags revision', () => {
@@ -41,7 +41,7 @@ test('specific unsupported diagnoses, values and changed triggers are flagged', 
     ['Es liegt eine Lungenembolie vor.', 'diagnosis'],
     ['Atemnot in Ruhe beobachtet.', 'changed-trigger'],
     ['Patientin berichtet über Atemnot beim Gehen. Atemfrequenz 25.', 'measurement'],
-    ['Patientin berichtet über Atemnot beim Gehen. Blutzucker 120 mg/dL.', null]
+    ['Patientin berichtet über Atemnot beim Gehen. Blutzucker 120 mg/dL.', 'measurement']
   ]) {
     const result = assessIntegrity(text, 'note').factual;
     if (issue) assert.ok(hasIssue(result, issue), text);
@@ -51,7 +51,6 @@ test('specific unsupported diagnoses, values and changed triggers are flagged', 
 
 test('uncertain or unseen answers cannot receive a positive automatic verdict', () => {
   for (const text of [
-    'Beim Spazieren gerät sie außer Atem, sagt die Patientin.',
     'Patientin berichtet über Atemnot beim Gehen. SpO₂ nicht gemessen.',
     'Patientin berichtet über Atemnot beim Gehen. Keine Pneumonie.',
     'Die Patientin berichtet über Atemnot beim Gehen?'
@@ -84,21 +83,41 @@ test('readiness distinguishes missing APIs, provider failures and supported stat
 });
 
 
-test('cloud choice maps only to a curated topic example and guidance', () => {
-  for (const topic of ['audience', 'attribution', 'concise']) {
-    const prompt = buildPublicCoachPrompt(topic);
-    for (const choice of ['A', 'B']) {
-      const feedback = readPublicCoachChoice(topic, JSON.stringify({ choice }));
-      assert.ok(prompt.includes(`${choice}: ${feedback.german}`));
-      assert.ok(feedback.english.length > 0);
-      assert.ok(integrityStages.some(stage => {
-        const verdict = assessIntegrity(feedback.german, stage.id);
-        return verdict.factual.state === 'verified' && verdict.grammar.state === 'verified';
-      }));
-    }
+test('cloud creates a varied two-register drill with a locally graded attribution question', () => {
+  const patient = 'Beim Spazieren werde ich kurzatmig.';
+  const handover = 'Die Patientin schildert Luftnot beim Spazieren.';
+  const note = 'Eigenangabe: Luftnot beim Spazieren.';
+  for (const [topic, first, second, answer] of [
+    ['audience', patient, handover, 'schildert'],
+    ['attribution', handover, note, 'Eigenangabe'],
+    ['concise', handover, note, 'Eigenangabe']
+  ]) {
+    const drill = readPublicCoachDrill(topic, JSON.stringify({ first, second }));
+    assert.deepEqual(drill.lines.map(line => line.sentence), [first, second]);
+    assert.equal(drill.answer, answer);
+    assert.equal(drill.options.length, 3);
   }
-  for (const outcome of ['not JSON', 'null', '{"choice":"C"}', '{"choice":"constructor"}',
-    '{"choice":"A","english":"invented claim"}', '{"german":"Die SpO₂ beträgt 80 %."}']) {
-    assert.throws(() => readPublicCoachChoice('attribution', outcome), /feedback-format/);
+  assert.throws(() => readPublicCoachDrill('attribution', '{"first":"x","second":"y","advice":"z"}'), /feedback-format/);
+  for (const second of ['Atemnot beim Gehen beobachtet.', 'Patientenangabe: SpO₂ 92 %.', 'Patientenangabe: Atemnot aufgrund einer Pneumonie.']) {
+    assert.throws(() => readPublicCoachDrill('attribution', JSON.stringify({ first: handover, second })), /unverified-example/);
   }
+});
+
+test('uncertain drafts are held, and the fact verdict is separate from wording', () => {
+  const unknown = assessIntegrity('Laut der Patientin kommt es zur Lufthunger-Episode beim Gehen.', 'note');
+  assert.equal(unknown.factual.state, 'review');
+  assert.deepEqual(unknown.factual.issues, []);
+  for (const draft of [
+    'Beim Gehen bin ich nicht kurzatmig.',
+    'Beim Gehen gerate ich außer Atem. Außerdem habe ich Brustschmerzen.',
+    'Beim Gehen gerate ich außer Atem. Es besteht Verdacht auf Bronchitis.',
+    'Beim Gehen gerate ich außer Atem. Blutdruck hundertachtzig.'
+  ]) {
+    assert.notEqual(assessIntegrity(draft, 'patient').factual.state, 'verified');
+  }
+  const revised = assessIntegrity('Beim Gehen werde ich kurzatmig.', 'patient');
+  assert.equal(assessIntegrity('Beim Spazieren gerät sie außer Atem, sagt die Patientin.', 'handover').factual.state, 'verified');
+  assert.equal(assessIntegrity('Die Patientin berichtet beim Gehen über Atemnot.', 'handover').factual.state, 'review');
+  assert.equal(revised.factual.state, 'verified');
+  assert.equal(revised.grammar.state, 'review');
 });

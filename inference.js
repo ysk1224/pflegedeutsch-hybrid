@@ -25,7 +25,7 @@ export async function readDeviceAvailability(provider = globalThis.LanguageModel
   return 'unknown';
 }
 
-export async function generateFeedback(model, prompt, expectedSource, { onFirstText = () => {}, readResponse = readFeedback } = {}) {
+export async function generateFeedback(model, prompt, expectedSource, { onFirstText = () => {}, readResponse = readFeedback, timeout = 45_000 } = {}) {
   const controller = new AbortController();
   const started = performance.now();
   const collect = async () => {
@@ -45,5 +45,5 @@ export async function generateFeedback(model, prompt, expectedSource, { onFirstT
     if (source !== expectedSource) throw new Error('unexpected-source');
     return { feedback: readResponse(response.text()), source, first };
   };
-  return withDeadline(collect(), 45_000, () => controller.abort());
+  return withDeadline(collect(), timeout, () => controller.abort());
 }
