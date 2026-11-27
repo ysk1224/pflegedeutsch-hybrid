@@ -1,0 +1,285 @@
+{
+  "candidate": "504b19ec63755ef8c33b2a251fa2f288717e11a1",
+  "firebaseRelease": "4a5c27911b534e64",
+  "observedAt": "2026-11-27",
+  "method": "Connected desktop Chrome, existing Firebase Hosting preview with its query-gated audit observer",
+  "production": {
+    "audit": false,
+    "bundle": "/assets/index-DaBZlm6c.js",
+    "version": "v0.8 Competition Edition"
+  },
+  "preview": {
+    "bundle": "/assets/index-C_2TAGnf.js",
+    "version": "v0.9 Final Competition Edition"
+  },
+  "noProviderPostsBeforeConsent": true,
+  "successfulUserRequests": 10,
+  "providerRequests": [
+    {
+      "providerPost": 1,
+      "consentRequests": 1,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 2,
+      "consentRequests": 2,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 3,
+      "consentRequests": 3,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 4,
+      "consentRequests": 4,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 5,
+      "consentRequests": 5,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 6,
+      "consentRequests": 6,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 7,
+      "consentRequests": 7,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 8,
+      "consentRequests": 8,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 9,
+      "consentRequests": 9,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 10,
+      "consentRequests": 10,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    }
+  ],
+  "submissions": [
+    {
+      "consentRequests": 1,
+      "providerPosts": 0,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 2,
+      "providerPosts": 1,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 3,
+      "providerPosts": 2,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 4,
+      "providerPosts": 3,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 5,
+      "providerPosts": 4,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 6,
+      "providerPosts": 5,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 7,
+      "providerPosts": 6,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 8,
+      "providerPosts": 7,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 9,
+      "providerPosts": 8,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 10,
+      "providerPosts": 9,
+      "markerInDraft": true
+    }
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "topic": "Patient report versus observation",
+      "passed": true,
+      "gradedCorrect": true
+    },
+    {
+      "run": 2,
+      "topic": "Patient, colleague and record language",
+      "passed": true,
+      "elapsedMs": 3521,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Beim Gehen werde ich kurzatmig.",
+        "- paragraph: Der Patient berichtet über Dyspnoe beim Gehen.",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 3,
+      "topic": "Concise nursing notes",
+      "passed": true,
+      "elapsedMs": 2443,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Die Patientin berichtet über Atemnot beim Gehen.",
+        "- paragraph: \"Patientenangabe: Atemnot beim Gehen.\"",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 4,
+      "topic": "Patient report versus observation",
+      "passed": true,
+      "elapsedMs": 2827,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Der Patient berichtet über Atemnot beim Gehen.",
+        "- paragraph: \"Patientenangabe: Atemnot beim Gehen.\"",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 5,
+      "topic": "Patient, colleague and record language",
+      "passed": true,
+      "elapsedMs": 2467,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Beim Gehen werde ich kurzatmig.",
+        "- paragraph: Die Patientin beschreibt Dyspnoe beim Gehen.",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 6,
+      "topic": "Concise nursing notes",
+      "passed": true,
+      "elapsedMs": 2694,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Die Patientin berichtet über Atemnot beim Gehen.",
+        "- paragraph: \"Patientenangabe: Atemnot beim Gehen.\"",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 7,
+      "topic": "Patient report versus observation",
+      "passed": true,
+      "elapsedMs": 2512,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Der Patient berichtet über Atemnot beim Gehen.",
+        "- paragraph: \"Patientenangabe: Atemnot beim Gehen.\"",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 8,
+      "topic": "Patient, colleague and record language",
+      "passed": true,
+      "elapsedMs": 2512,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Beim Gehen bekomme ich schlecht Luft.",
+        "- paragraph: Der Patient berichtet über Atemnot beim Gehen.",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 9,
+      "topic": "Concise nursing notes",
+      "passed": true,
+      "elapsedMs": 2710,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Der Patient berichtet über Atemnot beim Gehen.",
+        "- paragraph: \"Laut Patient: Atemnot beim Gehen.\"",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    },
+    {
+      "run": 10,
+      "topic": "Patient report versus observation",
+      "passed": true,
+      "elapsedMs": 2687,
+      "status": [
+        "    - status: Cloud AI · Public-case coaching"
+      ],
+      "examples": [
+        "- paragraph: Der Patient berichtet über Atemnot beim Gehen.",
+        "- paragraph: \"Patientenangabe: Atemnot beim Gehen.\"",
+        "- paragraph: Which phrase in the second example shows where the information came from?"
+      ]
+    }
+  ]
+}
