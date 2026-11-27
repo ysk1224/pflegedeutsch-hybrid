@@ -183,9 +183,7 @@ $('coachForm').addEventListener('submit', async event => {
   status.textContent = 'Requesting cloud coaching…';
   try {
     const result = await request;
-    const match = integrityStages.find(item => acceptPublicExample(result.feedback.german, item.id));
-    if (!match) throw new Error('unverified-example');
-    showSuggestion(output, result.feedback.german, [match.success]);
+    showSuggestion(output, result.feedback.german, [result.feedback.english]);
     status.textContent = 'Cloud AI · Public-case coaching';
   } catch (error) {
     status.textContent = feedbackError(error, true);

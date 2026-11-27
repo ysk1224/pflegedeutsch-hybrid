@@ -46,7 +46,7 @@ async function fixture(t, settings = {}) {
   t.after(() => context.close());
   const external = [];
   const cloud = [];
-  let respond = validResponse;
+  let respond = { choice: 'A' };
   let allowAttestation = true;
   await context.route('**/*', async route => {
     const request = route.request();
@@ -165,12 +165,14 @@ test('Chromium request capture: no external traffic before consent; cloud sends 
   await page.locator('#coachConsent').check();
   await page.locator('#coachRun').click();
   await waitForText(page, '#coachStatus', /Cloud AI/);
-  assert.match(await page.locator('#coachOutput').innerText(), /Document the source/);
+  assert.match(await page.locator('#coachOutput').innerText(), /Document the source concisely/);
   assert.doesNotMatch(await page.locator('#coachOutput').innerText(), /nominative case/);
   assert.equal(await page.locator('#coachConsent').isChecked(), false);
   assert.equal(cloud.length, 1);
   assert.match(cloud[0].body, /breathlessness while walking/);
   assert.match(cloud[0].body, /concise nursing note/);
+  assert.match(cloud[0].body, /Patientenangabe/);
+  assert.deepEqual(JSON.parse(cloud[0].body).generationConfig.responseSchema.properties.choice.enum, ['A', 'B']);
   assert.equal(cloud[0].headers['x-firebase-appcheck'], 'fixture-app-check-token');
   assert.ok(external.every(item => !JSON.stringify(item).includes(sentinel)));
   assert.equal(await page.locator('#labDraft').inputValue(), sentinel);
@@ -180,7 +182,7 @@ test('Chromium request capture: no external traffic before consent; cloud sends 
   setResponse({ german: 'Die Sauerstoffsättigung beträgt 80 %.', english: 'Invented measurement' });
   await page.locator('#coachConsent').check();
   await page.locator('#coachRun').click();
-  await waitForText(page, '#coachStatus', /could not be matched/);
+  await waitForText(page, '#coachStatus', /could not be verified/);
   assert.equal(await page.locator('#coachOutput').isVisible(), false);
   setResponse(429);
   await page.locator('#coachConsent').check();

@@ -45,7 +45,7 @@ window.pflegeDevice = Object.freeze({
     if (await readDeviceAvailability() !== 'available') throw new Error('device-unavailable');
     onGenerate();
     try {
-      const result = await generateFeedback(deviceModel, prompt, 'device', onFirstText);
+      const result = await generateFeedback(deviceModel, prompt, 'device', { onFirstText });
       return { ...result, total: (performance.now() - started) / 1000 };
     } catch (error) {
       if (error.message === 'feedback-timeout') model = undefined;

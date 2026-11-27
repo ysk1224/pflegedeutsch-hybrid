@@ -1,7 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getToken, initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode } from 'firebase/ai';
-import { feedbackSchema, withDeadline } from './feedback.js';
+import { withDeadline } from './feedback.js';
+import { caseFacts, integrityStages } from './integrity.js';
 import { configured, firebaseOptions, generateFeedback } from './inference.js';
 
 const siteKey = import.meta.env?.VITE_RECAPTCHA_SITE_KEY;
@@ -21,8 +22,8 @@ function getCloudService() {
       inCloudParams: {
         model: 'gemini-3.5-flash-lite',
         generationConfig: {
-          temperature: 0.2, maxOutputTokens: 420,
-          responseMimeType: 'application/json', responseSchema: feedbackSchema
+          temperature: 0, maxOutputTokens: 96,
+          responseMimeType: 'application/json', responseSchema: choiceSchema
         }
       }
     });
@@ -31,23 +32,62 @@ function getCloudService() {
   return cloud;
 }
 
+const [patient, handover, note] = integrityStages;
 const publicTask = Object.freeze({
-  audience: 'Explain that first person fits the patient speaking, and attributed third person fits a colleague or the record.',
-  attribution: 'Explain the difference between a patient report and a directly observed finding.',
-  concise: 'Explain how to express the same case facts in a concise nursing note.'
+  audience: {
+    instruction: 'Choose an example that helps learners compare patient language with attributed speech.',
+    guidance: 'A patient can speak in the first person. A colleague’s handover names the patient as the source of the report.',
+    examples: { A: patient.sample, B: handover.sample }
+  },
+  attribution: {
+    instruction: 'Choose the clearest example for explaining a patient report versus a direct observation.',
+    guidance: 'Attribute the symptom to the patient. The case supplies no direct observation or measured finding.',
+    examples: { A: handover.sample, B: note.sample }
+  },
+  concise: {
+    instruction: 'Choose how to express the same case facts in a concise nursing note.',
+    guidance: 'Document the source concisely and keep the walking trigger in the record.',
+    examples: { A: note.sample, B: note.accepted[2] }
+  }
 });
 
-export function buildPublicCoachPrompt(topic) {
+const choiceSchema = {
+  type: 'object',
+  properties: { choice: { type: 'string', format: 'enum', enum: ['A', 'B'] } },
+  required: ['choice']
+};
+
+function getTopic(topic) {
   if (typeof topic !== 'string' || !Object.hasOwn(publicTask, topic)) {
     throw new Error('unknown-coach-topic');
   }
+  return publicTask[topic];
+}
+
+export function buildPublicCoachPrompt(topic) {
+  const task = getTopic(topic);
   return [
-    'You are coaching German for a fictional language exercise. Use only the public case facts supplied here.',
-    'The patient reports breathlessness while walking. No measurement, diagnosis or direct observation is supplied.',
-    publicTask[topic],
-    'Return a JSON object with german (one short German example) and english (up to two explanatory sentences).',
-    'Do not add clinical facts, measurements, diagnoses, procedures or treatment recommendations.'
+    'Choose a German example for this public fictional language exercise.',
+    caseFacts,
+    task.instruction,
+    ...Object.entries(task.examples).map(([choice, example]) => `${choice}: ${example}`),
+    'Return one JSON object with the choice set to A or B.'
   ].join(' ');
+}
+
+export function readPublicCoachChoice(topic, text) {
+  const task = getTopic(topic);
+  let response;
+  try {
+    response = JSON.parse(text);
+  } catch {
+    throw new Error('feedback-format');
+  }
+  if (!response || Object.keys(response).length !== 1 ||
+      typeof response.choice !== 'string' || !Object.hasOwn(task.examples, response.choice)) {
+    throw new Error('feedback-format');
+  }
+  return { german: task.examples[response.choice], english: task.guidance };
 }
 
 export async function requestPublicCoaching(topic, consent) {
@@ -62,5 +102,5 @@ export async function requestPublicCoaching(topic, consent) {
   } catch {
     throw new Error('cloud-app-check-failed');
   }
-  return generateFeedback(model, prompt, 'cloud');
+  return generateFeedback(model, prompt, 'cloud', { readResponse: text => readPublicCoachChoice(topic, text) });
 }

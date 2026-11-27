@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPublicCoachPrompt, requestPublicCoaching } from '../cloud-coach.js';
+import { buildPublicCoachPrompt, readPublicCoachChoice, requestPublicCoaching } from '../cloud-coach.js';
 import { readDeviceAvailability } from '../inference.js';
 import { assessIntegrity, buildIntegrityLanguagePrompt, compareAttempts, integrityStages } from '../integrity.js';
 
@@ -81,4 +81,24 @@ test('readiness distinguishes missing APIs, provider failures and supported stat
   }
   assert.equal(await readDeviceAvailability({ availability: async () => 'new-status', create() {} }), 'unknown');
   assert.equal(await readDeviceAvailability({ availability: async () => { throw Error(); }, create() {} }), 'unknown');
+});
+
+
+test('cloud choice maps only to a curated topic example and guidance', () => {
+  for (const topic of ['audience', 'attribution', 'concise']) {
+    const prompt = buildPublicCoachPrompt(topic);
+    for (const choice of ['A', 'B']) {
+      const feedback = readPublicCoachChoice(topic, JSON.stringify({ choice }));
+      assert.ok(prompt.includes(`${choice}: ${feedback.german}`));
+      assert.ok(feedback.english.length > 0);
+      assert.ok(integrityStages.some(stage => {
+        const verdict = assessIntegrity(feedback.german, stage.id);
+        return verdict.factual.state === 'verified' && verdict.grammar.state === 'verified';
+      }));
+    }
+  }
+  for (const outcome of ['not JSON', 'null', '{"choice":"C"}', '{"choice":"constructor"}',
+    '{"choice":"A","english":"invented claim"}', '{"german":"Die SpO₂ beträgt 80 %."}']) {
+    assert.throws(() => readPublicCoachChoice('attribution', outcome), /feedback-format/);
+  }
 });
