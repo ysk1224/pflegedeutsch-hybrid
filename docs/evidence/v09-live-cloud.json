@@ -1,0 +1,204 @@
+{
+  "date": "2026-11-27",
+  "host": "https://pflegedeutsch-hybrid--v08-review-pkbb3x48.web.app",
+  "previewRelease": "b3d508ca329460d6",
+  "codeCommit": "14b278412520d248cb9de6d9278e7dbac87e3ece",
+  "appAsset": "index-D_hyHQR2.js",
+  "method": "Project-owner desktop Chrome. Preview-only fetch observer records exact response status and payload booleans without logging payload content or credentials.",
+  "trials": [
+    {
+      "topic": "Patient report versus observation",
+      "seconds": 4.874,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Colleague handover\n\nDer Patient berichtet über Atemnot beim Gehen.\n\nNursing record\n\nPatientenangabe: Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nPatientenangabe\nAtemnot"
+    },
+    {
+      "topic": "Patient, colleague and record language",
+      "seconds": 4.705,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Patient voice\n\nBeim Gehen bekomme ich schlecht Luft.\n\nColleague handover\n\nDer Patient berichtet über Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nberichtet über\nAtemnot"
+    },
+    {
+      "topic": "Concise nursing notes",
+      "seconds": 4.613,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Colleague handover\n\nDie Patientin berichtet über Atemnot beim Gehen.\n\nNursing record\n\nPatientenangabe: Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nPatientenangabe\nAtemnot"
+    },
+    {
+      "topic": "Patient report versus observation",
+      "seconds": 4.605,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Colleague handover\n\nDer Patient berichtet über Atemnot beim Gehen.\n\nNursing record\n\nPatientenangabe: Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nPatientenangabe\nAtemnot"
+    },
+    {
+      "topic": "Patient, colleague and record language",
+      "seconds": 4.818,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Patient voice\n\nBeim Gehen bekomme ich schlecht Luft.\n\nColleague handover\n\nDer Patient berichtet über Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nberichtet über\nAtemnot"
+    },
+    {
+      "topic": "Concise nursing notes",
+      "seconds": 4.485,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Colleague handover\n\nDie Patientin beschreibt Atemnot beim Gehen.\n\nNursing record\n\nPatientenangabe: Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nPatientenangabe\nAtemnot"
+    },
+    {
+      "topic": "Patient report versus observation",
+      "seconds": 4.746,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Colleague handover\n\nDer Patient berichtet über Luftnot beim Gehen.\n\nNursing record\n\nLaut Patient: Luftnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nLaut Patient\nLuftnot"
+    },
+    {
+      "topic": "Patient, colleague and record language",
+      "seconds": 4.758,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Patient voice\n\nBeim Gehen bekomme ich schlecht Luft.\n\nColleague handover\n\nDer Patient berichtet über Luftnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nberichtet über\nLuftnot"
+    },
+    {
+      "topic": "Concise nursing notes",
+      "seconds": 4.441,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Colleague handover\n\nDie Patientin berichtet über Atemnot beim Gehen.\n\nNursing record\n\nPatientenangabe: Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nPatientenangabe\nAtemnot"
+    },
+    {
+      "topic": "Patient report versus observation",
+      "seconds": 4.991,
+      "status": "Cloud AI · Public-case coaching",
+      "drill": "Colleague handover\n\nDer Patient berichtet über Atemnot beim Gehen.\n\nNursing record\n\nPatientenangabe: Atemnot beim Gehen.\n\nWhich phrase in the second example shows where the information came from?\n\nbeim Gehen\nPatientenangabe\nAtemnot"
+    }
+  ],
+  "submissions": [
+    {
+      "consentRequests": 1,
+      "providerPosts": 0,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 2,
+      "providerPosts": 1,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 3,
+      "providerPosts": 2,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 4,
+      "providerPosts": 3,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 5,
+      "providerPosts": 4,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 6,
+      "providerPosts": 5,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 7,
+      "providerPosts": 6,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 8,
+      "providerPosts": 7,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 9,
+      "providerPosts": 8,
+      "markerInDraft": true
+    },
+    {
+      "consentRequests": 10,
+      "providerPosts": 9,
+      "markerInDraft": true
+    }
+  ],
+  "providerPosts": [
+    {
+      "providerPost": 1,
+      "consentRequests": 1,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 2,
+      "consentRequests": 2,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 3,
+      "consentRequests": 3,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 4,
+      "consentRequests": 4,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 5,
+      "consentRequests": 5,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 6,
+      "consentRequests": 6,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 7,
+      "consentRequests": 7,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 8,
+      "consentRequests": 8,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 9,
+      "consentRequests": 9,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    },
+    {
+      "providerPost": 10,
+      "consentRequests": 10,
+      "textBodyObserved": true,
+      "publicCasePresent": true,
+      "syntheticMarkerPresent": false,
+      "httpStatus": 200
+    }
+  ]
+}

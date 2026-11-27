@@ -1,9 +1,10 @@
 import { assessIntegrity } from '../../integrity.js';
 
-// Items and labels were authored after the v0.9 rule freeze at 9920e5d.
+// Batch A was authored after the rule freeze at 9920e5d and exposed a Unicode issue.
+// Batch B was authored after the correction at 14b2784. Its labels were fixed before execution.
 // They are distinct from the original 36 development items. These engineering
 // labels are not independent bilingual clinical annotations.
-const accepted = [
+const batchA = { accepted: [
   ['patient', 'Ich kriege schlecht Luft, wenn ich gehe.'],
   ['patient', 'Beim Gehen fällt mir das Atmen schwer.'],
   ['patient', 'Wenn ich spazieren gehe, gerate ich außer Atem.'],
@@ -24,8 +25,7 @@ const accepted = [
   ['note', 'Subjektiv: Beim Gehen gerät sie außer Atem.'],
   ['note', 'Patientenangaben: Beim Gehen fällt das Atmen schwer.'],
   ['note', 'Gehen löst nach Aussage der Patientin Luftnot aus.']
-];
-const incorrect = [
+], incorrect: [
   ['patient', 'Ich werde kurzatmig.', 'trigger-unconfirmed'],
   ['handover', 'Die Patientin schildert Atemnot.', 'trigger-unconfirmed'],
   ['note', 'Patientenangabe: Beim Spazieren.', 'symptom-unconfirmed'],
@@ -46,13 +46,69 @@ const incorrect = [
   ['handover', 'Die Patientin meldet beim Gehen Luftnot. Es besteht eine Hypoxämie.', 'diagnosis'],
   ['note', 'Subjektiv: Atemnot beim Gehen. Seit drei Monaten.', 'unsupported-duration'],
   ['handover', 'Laut Patientin Atemnot beim Gehen und Brustdruck.', 'unsupported-symptom']
-];
-const uncertain = [
+], uncertain: [
   ['patient', 'Beim Gehen strengt mich etwas an.'],
   ['handover', 'Die Patientin berichtet beim Gehen über Luftnot.'],
   ['note', 'Bericht über unklare Beschwerden bei Bewegung.'],
   ['handover', 'Patientin meldet Luftnot beim Gehen?']
-];
+] };
+const batchB = {
+  accepted: [
+    ['patient', 'Ich bin außer Atem, wenn ich zu Fuß unterwegs bin.'],
+    ['patient', 'Beim Spazieren bekomme ich wenig Luft.'],
+    ['patient', 'Sobald ich gehe, werde ich kurzatmig.'],
+    ['patient', 'Wenn ich gehe, habe ich Schwierigkeiten beim Atmen.'],
+    ['patient', 'Beim Gehen habe ich Atemprobleme.'],
+    ['patient', 'Wenn ich gehe, fällt mir das Atmen schwer.'],
+    ['patient', 'Beim Gehen ringe ich nach Luft.'],
+    ['patient', 'Beim Spaziergang wird mir das Atmen mühsam.'],
+    ['handover', 'Der Patient schildert Luftnot beim Gehen.'],
+    ['handover', 'Die Patientin meldet Atemnot beim Spazieren.'],
+    ['handover', 'Laut der Patientin tritt beim Gehen Luftnot auf.'],
+    ['handover', 'Die Patientin berichtet über Atemprobleme zu Fuß.'],
+    ['handover', 'Der Patient gibt an, beim Gehen außer Atem zu geraten.'],
+    ['handover', 'Die Patientin beschreibt Kurzatmigkeit bei Gehbelastung.'],
+    ['handover', 'Wenn sie geht, wird sie kurzatmig, sagt die Patientin.'],
+    ['handover', 'Beim Spazieren verliert sie den Atem, so die Patientin.'],
+    ['note', 'Patientenangaben: Luftnot beim Spazieren.'],
+    ['note', 'Subjektiv: Atemprobleme zu Fuß.'],
+    ['note', 'Eigenangabe: Beim Gehen schwer zu atmen.'],
+    ['note', 'Laut Patientin Dyspnoe bei Gehbelastung.'],
+    ['note', 'Nach eigenen Angaben Luftnot beim Gehen.'],
+    ['note', 'Patientin schildert Luftnot, wenn sie geht.'],
+    ['note', 'Patientin: „Wenn ich gehe, bin ich außer Atem.“'],
+    ['note', 'Kurz nach Beginn eines Fußwegs beschriebene Atembeschwerden.']
+  ],
+  incorrect: [
+    ['patient', 'Ich bin kurzatmig.', 'trigger-unconfirmed'],
+    ['patient', 'Ich bekomme beim Gehen gut Luft.', 'negated-fact'],
+    ['handover', 'Die Patientin schildert Luftnot.', 'trigger-unconfirmed'],
+    ['note', 'Subjektiv: Zu Fuß.', 'symptom-unconfirmed'],
+    ['note', 'Beim Spazieren tritt Dyspnoe auf.', 'attribution-unconfirmed'],
+    ['note', 'Luftnot beim Treppensteigen beobachtet.', 'changed-trigger'],
+    ['note', 'Beim Gehen wurde Dyspnoe festgestellt.', 'observation'],
+    ['handover', 'Wir beobachteten beim Gehen Atemnot.', 'observation'],
+    ['patient', 'Ich bekomme beim Radfahren schlecht Luft.', 'changed-trigger'],
+    ['handover', 'Die Patientin meldet Atemnot im Sitzen.', 'changed-trigger'],
+    ['patient', 'Beim Gehen verneine ich Atemnot.', 'negated-fact'],
+    ['handover', 'Die Patientin schildert Atemnot beim Gehen. Blutzucker 12 mmol/L.', 'measurement'],
+    ['note', 'Atemnot zu Fuß laut Patientin. Atemfrequenz 33 pro Minute.', 'measurement'],
+    ['note', 'Laut Patientin Luftnot beim Gehen. Puls neunzig.', 'measurement'],
+    ['note', 'Eigenangabe: Luftnot beim Gehen. Verdacht auf Asthma.', 'diagnosis'],
+    ['handover', 'Der Patient schildert Atemnot beim Gehen durch Herzinsuffizienz.', 'diagnosis'],
+    ['note', 'Patientenangabe: Atemnot beim Gehen. Diagnose: Lungenödem.', 'diagnosis'],
+    ['note', 'Eigenangabe: Atemnot beim Gehen. Deutliche Zyanose.', 'unsupported-symptom'],
+    ['handover', 'Die Patientin schildert Atemnot beim Gehen seit gestern.', 'unsupported-duration'],
+    ['patient', 'Wenn ich gehe, bekomme ich schlecht Luft und habe Husten.', 'unsupported-symptom']
+  ],
+  uncertain: [
+    ['patient', 'Ich bin beim Gehen irgendwie verändert.'],
+    ['handover', 'Die Patientin schildert beim Gehen Atemnot.'],
+    ['note', 'Ich möchte klären, ob die Patientin Atemprobleme schildert.'],
+    ['note', 'Luftnot? Gehbelastung?']
+  ]
+};
+const { accepted, incorrect, uncertain } = process.argv.includes('--a') ? batchA : batchB;
 const records = Object.entries({ accepted, incorrect, uncertain }).flatMap(([group, cases]) =>
   cases.map(([stage, draft, expectedType]) => {
     const { factual, grammar } = assessIntegrity(draft, stage);
