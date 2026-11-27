@@ -2,7 +2,8 @@ import { exercises, buildPrompt, validateAnswer } from './exercises.js';
 import { referenceFor } from './grammar.js';
 import { demoAnswer, followups, knownErrors, vocabulary } from './learning.js';
 import { feedbackError } from './feedback.js';
-import { configured, requestFeedback } from './inference.js';
+import { requestDeviceFeedback, showDeviceAvailability } from './device-client.js';
+import './lab-ui.js';
 import { loadIds, nextReviewId, saveIds } from './study.js';
 
 const $ = id => document.getElementById(id);
@@ -14,7 +15,7 @@ const reviewKey = 'pflege-review';
 const completed = loadIds(storage, completedKey, validIds);
 const review = loadIds(storage, reviewKey, validIds);
 const drafts = new Map();
-const runControls = ['case', 'answer', 'cloud', 'run', 'demo', 'mark', 'followAnswer', 'followRun'];
+const runControls = ['case', 'answer', 'run', 'demo', 'mark', 'followAnswer', 'followRun'];
 
 let exercise = exercises[0];
 let busy = false;
@@ -61,7 +62,6 @@ function showExercise(id) {
   const [draft = '', secondDraft = ''] = drafts.get(id) ?? [];
   $('answer').value = draft;
   $('followAnswer').value = secondDraft;
-  $('cloud').checked = false;
   $('sampleText').textContent = exercise.sample;
   $('followQuestion').textContent = followup.question;
   $('followSample').textContent = followup.sample;
@@ -112,6 +112,7 @@ function showChecks(checks, followup) {
 function setBusy(active) {
   busy = active;
   for (const id of runControls) $(id).disabled = active;
+  for (const id of ['legacyDevice', 'followDevice']) $(id).disabled = active || $(id).dataset.ready !== 'true';
   showProgress();
 }
 
@@ -122,7 +123,7 @@ function showMetrics({ source, first, total }) {
   $('totalTime').textContent = `${total.toFixed(1)} s`;
 }
 
-async function checkAnswer(isFollowup) {
+async function checkAnswer(isFollowup, useDevice = false) {
   if (busy) return;
   const input = $(isFollowup ? 'followAnswer' : 'answer');
   const status = $(isFollowup ? 'followStatus' : 'status');
@@ -144,30 +145,24 @@ async function checkAnswer(isFollowup) {
     persist(reviewKey, review);
   }
 
-  if (!configured) {
+  if (!useDevice) {
     status.textContent = 'Phrase check complete. Open the example for comparison.';
     return;
   }
 
-  const allowCloud = $('cloud').checked;
   const followup = isFollowup ? followups[exercise.id] : null;
   setBusy(true);
   status.textContent = 'Preparing AI feedback…';
   try {
-    const result = await requestFeedback(buildPrompt(exercise, answer, followup, checks), allowCloud, {
-      onDownload: percent => { status.textContent = `Preparing the device model · ${percent}%`; },
-      onGenerate: () => { status.textContent = 'Generating AI feedback…'; },
-      onFirstText: () => { status.textContent = 'Checking the response format…'; }
-    });
+    const result = await requestDeviceFeedback(buildPrompt(exercise, answer, followup, checks), status);
     output.replaceChildren(element('h3', 'AI-suggested German'), element('p', result.feedback.german, 'de'),
       element('h3', 'AI explanation · English'), element('p', result.feedback.english, 'en'));
     output.hidden = false;
     showMetrics(result);
-    const description = { device: 'On-device AI', cloud: 'Cloud AI', unknown: 'Source unavailable' };
-    status.textContent = `${description[result.source]} · ${result.total.toFixed(1)} s total`;
+    status.textContent = `On-device AI · ${result.total.toFixed(1)} s total`;
     if (!isFollowup) markReviewed();
   } catch (error) {
-    status.textContent = feedbackError(error, allowCloud);
+    status.textContent = feedbackError(error);
   } finally {
     setBusy(false);
   }
@@ -202,6 +197,16 @@ $('demo').addEventListener('click', () => {
   $('answer').focus();
 });
 
-$('modePanel').hidden = !configured;
-$('setup').hidden = configured;
+$('legacyDevice').addEventListener('click', () => { void checkAnswer(false, true); });
+$('followDevice').addEventListener('click', () => { void checkAnswer(true, true); });
+for (const [input, output, status] of [['answer', 'output', 'status'], ['followAnswer', 'followOutput', 'followStatus']]) {
+  $(input).addEventListener('input', () => {
+    $(output).hidden = true;
+    $('metrics').hidden = true;
+    $(status).textContent = '';
+    if (input === 'answer') $('errorPanel').hidden = true;
+    else $('followChecks').replaceChildren();
+  });
+}
+void showDeviceAvailability($('deviceStatus'), ['labDevice', 'legacyDevice', 'followDevice'].map($));
 showExercise(exercise.id);

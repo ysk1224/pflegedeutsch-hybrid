@@ -1,30 +1,37 @@
 # Technical architecture
 
-| Component | Responsibility |
+| File | Responsibility |
 | --- | --- |
-| `index.html`, `styles.css`, `src.js` | Responsive scenario editor, AI consent, feedback, reference and follow-up |
-| `exercises.js`, `grammar.js`, `learning.js` | Fictional case facts, sample answers, vetted grammar examples, phrase checks and fixed follow-ups |
-| `inference.js` | Firebase client and App Check initialization, SDK inference modes, streamed response collection and time limits |
-| `feedback.js` | Shared response schema, validation, actual source interpretation and learner-facing errors |
-| `study.js` | Compatible loading and saving of review and completion IDs in browser storage |
-| `firebase.json`, `.github/workflows/build.yml` | Hosting configuration and reproducible test/build workflow |
+| `integrity.js` | Fictional source, three communication steps, separate grammar and case-fact checks, attempt comparison |
+| `lab-ui.js`, `index.html`, `styles.css` | Case brief, stage navigation, two verdicts, revision and coach actions |
+| `device.html`, `device.js`, `device-client.js` | Same-origin iframe, early capability check and isolated Firebase AI Logic on-device inference |
+| `cloud-coach.js` | Separate Firebase app and App Check, topic allowlist and explicit-consent cloud inference |
+| `inference.js`, `feedback.js` | SDK source verification, streaming, deadlines, output shape and user-facing failures |
+| `src.js`, `exercises.js`, `grammar.js`, `learning.js`, `study.js` | Scenario library, vocabulary, follow-ups and browser review queue |
+| `vite.config.js`, `firebase.json` | Two HTML entries and a hosting response CSP for the device frame |
 
-## Request and storage boundaries
+## Request boundaries
 
-1. The current case and typed answer are checked in the browser. Known phrase errors add the case ID to the review queue. Drafts stay in memory while the page is open.
-2. In a configured build, a learner action initializes the device model through Firebase AI Logic. With cloud consent off, the app selects `ONLY_ON_DEVICE`. With consent on, it selects `PREFER_ON_DEVICE`; the SDK can route to the configured cloud model when local inference is unavailable. The app uses the same routing for follow-up answers.
-3. The app sends one structured prompt with the fictional task, reference, verified phrase matches and quoted learner text. German and English are the declared Chrome model languages. Korean explanations remain curated. Schema validation checks response shape and length. The language suggestions still need to be compared with the reference.
-4. The app renders complete, validated fields as text and shows the SDK’s actual inference source when available. First-text time counts from the generation call. Total includes model preparation and response parsing. Device-only preparation has a three-minute deadline. Generation has a 45-second deadline and passes an abort signal to the SDK. Browser model download can continue after a local timeout.
-5. Only scenario IDs for completion and review are written to local storage by the app. Firebase App Check and Chrome manage their own service state. Cloud mode can send the fictional prompt to Google. A loaded study page can still use the static exercises if inference is unavailable.
-
-## Judge test steps
-
-| Test | Action | Evidence |
+| Action | Data used | Processing |
 | --- | --- | --- |
-| On-device | Start in current desktop Chrome with Gemini Nano ready and English/German supported. Load the demo, leave cloud fallback off, and select **Check my German**. | A completed response shows **On-device**. The three phrase checks and reference are separately visible. |
-| Device unavailable | On a browser without the built-in model, repeat with consent off. | A recoverable error, the original answer and the static reference remain available. |
-| SDK cloud fallback | On that same browser, enable cloud fallback for the fictional case and run the same answer again. | The completed response shows **Cloud**. |
-| Study and follow-up | Open the review queue after checking the demo. Open **Follow-up practice** in the handover case and try `Haben Sie andere Symptomen?`. | The rule check suggests `andere Symptome`. The sample is available with or without AI. Reload to confirm the review queue persists. |
-| Phone layout | Open on a narrow viewport or phone, select another case and navigate the editor, reference and review buttons. | Controls remain visible and reachable. Changing cases resets cloud consent. |
+| Check draft, compare attempts or check phrases | Current draft and curated rubric | Synchronous JavaScript in the browser. No SDK request. |
+| On-device grammar feedback | Draft, case and language prompt | Frame checks the Chrome Prompt API, calls Firebase AI Logic with `ONLY_ON_DEVICE`, and accepts only an SDK `on_device` response. The document and hosting CSP deny `connect-src`. The input form is in the parent document. |
+| Request cloud coaching | A public case prompt and an allowlisted topic | Explicit consent is consumed per request. App Check gets a valid token before invoking Gemini with `ONLY_IN_CLOUD`. The cloud caller has no parameter for a draft. Token auto-refresh is disabled. |
+| Review library | Reviewed and saved exercise IDs | Browser local storage readable across visits. Lab drafts and attempts remain in page memory. |
 
-If local inference is unavailable, check [Chrome’s language and device requirements](https://developer.chrome.com/docs/ai/get-started) and [Firebase’s hybrid setup](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started). Use fictional answers in both environments.
+Capability checks run before a draft is needed. A configured build distinguishes unavailable, unsupported, downloadable, downloading, ready and unknown states. Device initialization and generation have time limits. Chrome can continue a browser-managed model download after the app times out. The cloud path checks App Check within 12 seconds and limits generation to 45 seconds. The application only shows an AI source after it validates the actual SDK source and structured output. An AI example in the lab must match a curated form for both wording and facts. The UI pairs this example with built-in guidance from the corresponding exercise or grammar check. Neither AI path changes an assessment.
+
+The case rubric deliberately abstains on unrecognized wording. Known contradictions and missing or unconfirmed details are scoped to the supplied fictional scenario. A curated match is a match with bounded examples, with no general fluency or clinical competence claim. The reference and all checks remain accessible without AI. The cloud coach provides public instructional examples on unsupported devices and keeps draft-specific coaching local.
+
+## Judge walkthrough
+
+| Test | Action | Expected evidence |
+| --- | --- | --- |
+| First-use demo | Select **Try the handover demo**. | The same draft gets a fact flag for the invented oxygen reading and a separate flag for German subject–verb agreement. |
+| Separate assessments | Change only `berichten` to `berichtet` and check again. Then open **Reference and revision tip**, choose **Use reference as draft**, and check the draft. | Grammar can match while the reading is still flagged. The revision comparison reports the change independently. |
+| Documentation and uncertainty | Choose **Next step**, then **Check a practice mistake**. Try an unfamiliar valid paraphrase. | The draft confuses patient report with direct observation. An unfamiliar form can receive a review status without being marked correct. |
+| Device AI | On supported desktop Chrome with the German/English model ready, request **On-device grammar feedback**. | A matching result shows the actual device label. Otherwise the activity remains usable and displays an explanation. |
+| Consented cloud | Open **Optional cloud coaching**, choose a topic, check consent and request coaching. | A matching result shows the actual cloud label. Consent resets after the request. |
+| Review library | Load the ICU demo and run phrase checks. Open follow-up and try `Haben Sie andere Symptomen?`. | Reference, explanation and review queue remain usable without an AI model. |
+
+[Chrome built-in AI requirements](https://developer.chrome.com/docs/ai/get-started) · [Firebase AI Logic web hybrid setup](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started)

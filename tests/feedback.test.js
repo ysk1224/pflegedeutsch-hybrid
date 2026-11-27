@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { feedbackError, readFeedback, sourceKind, verifiedSource, withDeadline } from '../feedback.js';
+import { feedbackError, readFeedback, sourceKind, withDeadline } from '../feedback.js';
 
 test('structured feedback is only accepted with both bounded, nonempty strings', () => {
   assert.deepEqual(readFeedback('{"german":"  Er berichtet. ","english":"Verb in singular."}'),
@@ -16,10 +16,6 @@ test('SDK response is the source of labels, independent of requested mode', () =
   assert.equal(sourceKind('on_device'), 'device');
   assert.equal(sourceKind('in_cloud'), 'cloud');
   assert.equal(sourceKind(undefined), 'unknown');
-  assert.equal(verifiedSource('on_device', true), 'device');
-  assert.equal(verifiedSource('in_cloud', true), 'cloud');
-  assert.equal(verifiedSource(undefined, false), 'unknown');
-  assert.throws(() => verifiedSource('in_cloud', false), /unexpected-source/);
 });
 
 test('deadline resolves promptly, preserves failures and calls cancellation on timeout', async () => {

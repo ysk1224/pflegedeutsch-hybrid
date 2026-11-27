@@ -77,3 +77,49 @@ footer { color: var(--muted); font-size: .85rem; padding-bottom: 1.5rem; }
 @media (max-width: 30rem) {
   .actions > button { flex: 1 1 11rem; }
 }
+
+.hero nav { display: flex; flex-wrap: wrap; gap: .45rem 1.4rem; margin-top: .9rem; }
+.hero nav a { color: #fff; text-underline-offset: .2em; padding-block: .15rem; }
+.lab { grid-column: 1 / -1; min-width: 0; margin-bottom: .75rem; }
+.lab-header { display: grid; gap: 1rem; margin: .4rem 0 1rem; align-items: center; }
+.lab-label { color: var(--brand); font-weight: 700; font-size: .9rem; margin: 0 0 .4rem; }
+.lab-header h2 { font-size: clamp(1.55rem, 4vw, 2.25rem); letter-spacing: -.035em; margin: 0; }
+.lab-header #judgeTry { margin-top: .35rem; }
+.readiness { padding: .75rem .9rem; background: #e5f2ee; border: 1px solid #c0dcd4; border-radius: .65rem; }
+.readiness p { font-size: .875rem; color: var(--muted); margin-top: .2rem; }
+.stage-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; margin-bottom: .7rem; }
+.stage-nav button { color: var(--brand); background: white; overflow-wrap: anywhere; }
+.stage-nav [aria-current="step"] { color: white; background: var(--brand); }
+.lab-grid, .lab-results { display: grid; gap: .75rem; }
+.case-brief { background: #eaf5f1; }
+.case-brief blockquote { margin: .7rem 0 1rem; border-inline-start: 3px solid var(--brand); padding-inline-start: .75rem; font-size: 1.13rem; font-weight: 650; }
+.case-brief dl { margin: .7rem 0 1rem; }
+.case-brief dt { font-size: .86rem; color: var(--muted); font-weight: 650; }
+.case-brief dd { margin-bottom: .5rem; }
+.lab-work h3 { font-size: 1.2rem; }
+.lab-work details { border-top: 1px solid var(--border); margin-top: .85rem; }
+.lab-actions { margin-top: .65rem; }
+.lab-review { margin-top: 1rem; }
+.lab-review h4, .lab-review h5 { font-size: 1rem; margin: 0 0 .45rem; }
+.verdict { min-width: 0; padding: .85rem; border: 1px solid var(--border); border-radius: .65rem; background: #f3f7fa; overflow-wrap: anywhere; }
+.verdict p { margin: .35rem 0 0; }
+.verdict ul { margin: .5rem 0 0; padding-left: 1.1rem; }
+.verdict[data-verdict="revise"] { background: #fcf2e5; border-color: #dcb480; }
+.verdict[data-verdict="verified"] { background: #e8f5ed; border-color: #a7cbb5; }
+.coach { margin-top: .75rem; }
+.coach > summary { padding-block: .15rem; min-height: 2.35rem; align-content: center; }
+.coach form { max-width: 34rem; }
+.coach .consent { margin-block: .45rem; }
+@media (min-width: 40rem) {
+  .lab-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 52rem) {
+  .lab-header { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); }
+  .lab-grid { grid-template-columns: minmax(0, .85fr) minmax(0, 2fr); align-items: start; }
+}
+@media (max-width: 30rem) {
+  .stage-nav { grid-template-columns: 1fr; }
+  .stage-nav button { text-align: start; }
+}
+
+.lab-progress { margin: -.25rem 0 .65rem; }
