@@ -69,7 +69,8 @@ const uncertain = [
   ['handover', 'Die Patientin berichtet, dass sie geht; Atemnot wurde erwähnt.'],
   ['note', 'Eigenangabe: Unwohlsein beim Gehen.']
 ];
-const results = Object.entries({ valid, errors, uncertain }).flatMap(([group, rows]) =>
+const dataset = process.argv[2] ? (await import(process.argv[2])).default : { valid, errors, uncertain };
+const results = Object.entries(dataset).flatMap(([group, rows]) =>
   rows.map(([stage, draft, expectedIssue]) => {
     const { factual, grammar } = assessIntegrity(draft, stage);
     return { group, draft, stage, expectedIssue, fact: factual.state, grammar: grammar.state,
@@ -78,11 +79,11 @@ const results = Object.entries({ valid, errors, uncertain }).flatMap(([group, ro
 const count = (group, passes) => results.filter(row => row.group === group && passes(row)).length;
 const state = (group, name) => count(group, row => row.fact === name);
 const metrics = {
-  validAccepted: [state('valid', 'verified'), valid.length],
-  validFalseRevision: [state('valid', 'revise'), valid.length],
-  errorsFalseAcceptance: [state('errors', 'verified'), errors.length],
-  errorsExactType: [count('errors', row => row.issues.includes(row.expectedIssue)), errors.length],
-  errorsHeld: [state('errors', 'review'), errors.length],
-  uncertainHeld: [state('uncertain', 'review'), uncertain.length]
+  validAccepted: [state('valid', 'verified'), dataset.valid.length],
+  validFalseRevision: [state('valid', 'revise'), dataset.valid.length],
+  errorsFalseAcceptance: [state('errors', 'verified'), dataset.errors.length],
+  errorsExactType: [count('errors', row => row.issues.includes(row.expectedIssue)), dataset.errors.length],
+  errorsHeld: [state('errors', 'review'), dataset.errors.length],
+  uncertainHeld: [state('uncertain', 'review'), dataset.uncertain.length]
 };
 console.log(JSON.stringify({ metrics, results }, null, 2));
