@@ -127,3 +127,23 @@ test('Unicode word boundaries do not lose walking or infer a third-person pronou
   assert.equal(assessIntegrity('Zu Fuß werde ich kurzatmig.', 'patient').factual.state, 'verified');
   assert.equal(assessIntegrity('Wenn ich spazieren gehe, gerate ich außer Atem.', 'patient').factual.state, 'verified');
 });
+
+test('natural symptom clauses and attributed direct speech preserve the case', () => {
+  for (const [stage, draft] of [
+    ['patient', 'Beim Spazieren schnappe ich nach Luft.'],
+    ['patient', 'Auf einem Spaziergang fällt mir das Atmen schwer.'],
+    ['note', 'Eigenangabe: „Beim Gehen bekomme ich kaum Luft.“']
+  ]) {
+    assert.equal(assessIntegrity(draft, stage).factual.state, 'verified', draft);
+  }
+  for (const draft of [
+    'Ich: „Beim Gehen bekomme ich schlecht Luft.“',
+    'Patientin: „Beim Gehen bekomme ich schlecht Luft. Ich gehe.“',
+    'Patientin: „Beim Gehen bekomme ich schlecht Luft.“ Seit zwei Wochen.',
+    'Eigenangabe: „Beim Gehen bekomme ich schlecht Luft und habe Schüttelfrost.“'
+  ]) {
+    assert.notEqual(assessIntegrity(draft, 'note').factual.state, 'verified', draft);
+  }
+  assert.equal(assessIntegrity('Zu Fuß habe ich ein komisches Gefühl in der Lunge.', 'patient').factual.state, 'review');
+  assert.equal(assessIntegrity('Die Patientin meldet beim Gehen Atemnot.', 'handover').factual.state, 'review');
+});
